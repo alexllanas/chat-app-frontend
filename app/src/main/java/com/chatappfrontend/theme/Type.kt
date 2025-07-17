@@ -1,4 +1,4 @@
-package com.example.chat_app_frontend.ui.theme
+package com.chatappfrontend.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

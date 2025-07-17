@@ -1,4 +1,4 @@
-package com.example.chat_app_frontend
+package com.chatappfrontend.auth.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.chatappfrontend.design.R
 
 @Composable
 fun LoginScreen(

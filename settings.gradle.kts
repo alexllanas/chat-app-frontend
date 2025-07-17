@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "chat-app-frontend"
 include(":app")
- 
+include(":core")
+include(":core:design")
+include(":feature")
+include(":feature:auth")

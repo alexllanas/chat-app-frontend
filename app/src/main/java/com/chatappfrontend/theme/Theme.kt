@@ -1,6 +1,5 @@
-package com.example.chat_app_frontend.ui.theme
+package com.chatappfrontend.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

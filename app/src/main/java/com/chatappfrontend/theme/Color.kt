@@ -1,4 +1,4 @@
-package com.example.chat_app_frontend.ui.theme
+package com.chatappfrontend.theme
 
 import androidx.compose.ui.graphics.Color
 
