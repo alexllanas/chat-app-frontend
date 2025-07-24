@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.chatappfrontend.design.R
+import com.chatappfrontend.designsystem.R
 
 @Composable
 fun LoginScreen(
@@ -70,7 +70,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = onNavigateToRegister) {
-            Text(stringResource(id = R.string.no_account_register_prompt))
+            Text(stringResource(id = R.string.no_account_sign_up_prompt))
         }
     }
 }
