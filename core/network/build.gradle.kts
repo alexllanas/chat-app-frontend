@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.retrofit.core)
     implementation(libs.kotlinx.serialization.json)
+
     implementation(libs.retrofit.kotlin.serialization)
     implementation(libs.okhttp.logging)
     implementation(libs.javax.inject)
@@ -61,5 +62,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(project(":core:common"))
+    implementation(project(":core:security"))
     implementation(project(":core:model"))
 }

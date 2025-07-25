@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.chatappfrontend.auth.ui.LoginScreen
 import com.chatappfrontend.auth.ui.RegisterScreen
+import com.example.messages.ui.MessageListScreen
 
 @Composable
 fun AppNavHost(
@@ -16,9 +17,11 @@ fun AppNavHost(
 
         composable("register") {
             RegisterScreen(
-                onNavigateToLogin = {
-                    navController.navigate("login") {
-                    }
+                navigateToLoginScreen = {
+                    navController.navigate("login")
+                },
+                onRegisterSuccess = { route ->
+                    navController.navigate(route)
                 }
             )
         }
@@ -32,6 +35,14 @@ fun AppNavHost(
                     }
                 }
             )
+        }
+
+        composable("message_list") {
+             MessageListScreen(
+                 onLogout = { route ->
+                     navController.navigate(route)
+                 }
+             )
         }
     }
 }

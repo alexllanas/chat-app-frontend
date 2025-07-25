@@ -14,14 +14,27 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chatappfrontend.auth.viewmodel.RegisterViewModel
+import com.chatappfrontend.common.UiEvent
 import com.chatappfrontend.designsystem.R
 
 @Composable
 fun RegisterScreen(
-    registerViewModel: RegisterViewModel = hiltViewModel(),
-    onNavigateToLogin: () -> Unit
+    viewModel: RegisterViewModel = hiltViewModel(),
+    navigateToLoginScreen: () -> Unit,
+    onRegisterSuccess: (String) -> Unit
 ) {
-    val uiState by registerViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is UiEvent.Navigate -> {
+                    onRegisterSuccess(event.route)
+                }
+                is UiEvent.ShowSnackbar -> {}
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -39,7 +52,7 @@ fun RegisterScreen(
 
         OutlinedTextField(
             value = uiState.email,
-            onValueChange = registerViewModel::setEmail,
+            onValueChange = viewModel::setEmail,
             label = { Text(stringResource(id = R.string.email_label)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -50,7 +63,7 @@ fun RegisterScreen(
 
         OutlinedTextField(
             value = uiState.password,
-            onValueChange = registerViewModel::setPassword,
+            onValueChange = viewModel::setPassword,
             label = { Text(stringResource(id = R.string.password_label)) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -62,7 +75,7 @@ fun RegisterScreen(
 
         OutlinedTextField(
             value = uiState.confirmPassword,
-            onValueChange = registerViewModel::setConfirmPassword,
+            onValueChange = viewModel::setConfirmPassword,
             label = { Text(stringResource(id = R.string.confirm_password_label)) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -73,7 +86,7 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = registerViewModel::registerUser,
+            onClick = viewModel::registerUser,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(id = R.string.signup_button))
@@ -81,7 +94,7 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextButton(onClick = onNavigateToLogin) {
+        TextButton(onClick = navigateToLoginScreen) {
             Text(stringResource(id = R.string.already_have_account_login_prompt))
         }
     }

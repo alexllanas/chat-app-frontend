@@ -76,6 +76,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation(project(":core:common"))
+    implementation(project(":core:security"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:domain"))
 }

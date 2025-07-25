@@ -1,19 +1,42 @@
 package com.example.network.di
 
-import com.example.network.CAFNetworkDataSource
-import com.example.network.retrofit.RetrofitCAFNetwork
-import dagger.Binds
+import com.example.network.AuthInterceptor
+import com.example.security.TokenManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal interface NetworkModule {
+internal object NetworkModule {
 
-    @Binds
-    fun binds(impl: RetrofitCAFNetwork) : CAFNetworkDataSource
+    @Provides
+    internal fun provideNetworkJson(): Json = Json {
+        ignoreUnknownKeys = true
+    }
 
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(
+        tokenManager: TokenManager
+    ): Interceptor {
+        return AuthInterceptor(tokenManager)
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .build()
+    }
 }
+

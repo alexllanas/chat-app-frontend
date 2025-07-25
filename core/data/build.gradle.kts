@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.javax.inject)
+    implementation(libs.retrofit.core)
 
     // For dependency injection
     implementation(libs.hilt.android)
@@ -56,6 +57,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(project(":core:common"))
+    implementation(project(":core:security"))
     implementation(project(":core:model"))
     implementation(project(":core:network"))
 }
