@@ -1,6 +1,5 @@
 package com.example.network.retrofit
 
-import com.example.model.ProtectedResponse
 import com.example.model.User
 import com.example.network.CAFNetworkDataSource
 import com.example.network.model.RegisterRequest
@@ -22,8 +21,9 @@ private interface RetrofitCAFNetworkApi {
      @POST("register")
      suspend fun registerUser(@Body registerRequest: RegisterRequest): Response<User>
 
-     @GET("protected")
-     suspend fun testTokenAuthentication(): ProtectedResponse
+     @POST("login")
+     suspend fun login(@Body registerRequest: RegisterRequest): Response<User>
+
 }
 
 @Singleton
@@ -49,8 +49,9 @@ internal class RetrofitCAFNetwork @Inject constructor(
         )
     }
 
-    override suspend fun testTokenAuthentication(): ProtectedResponse {
-        return networkApi.testTokenAuthentication()
+    override suspend fun login(email: String, password: String): Response<User> {
+        return networkApi.login(
+            registerRequest = RegisterRequest(email = email, password = password)
+        )
     }
-
 }

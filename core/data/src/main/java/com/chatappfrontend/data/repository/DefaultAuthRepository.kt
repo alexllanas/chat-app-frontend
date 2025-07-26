@@ -36,6 +36,29 @@ internal class DefaultAuthRepository @Inject constructor(
         return result
     }
 
+    override suspend fun login(email: String, password: String): NetworkResult<User> {
+        val result = try {
+            val response = network.login(
+                email = email,
+                password = password
+            )
+            if (response.isSuccessful) {
+                val user = response.body()
+                if (user != null) {
+                    tokenManager.saveToken(user.accessToken)
+                    NetworkResult.Success(user)
+                } else {
+                    NetworkResult.Error(response.code(), "Login failed: No user data returned")
+                }
+            } else {
+                NetworkResult.Error(response.code(), "Login failed: ${response.errorBody()?.string() ?: "Unknown error"}")
+            }
+        } catch (e: Exception) {
+            NetworkResult.Exception(e)
+        }
+        return result
+    }
+
     override suspend fun logout(): Result {
         return tokenManager.clearToken()
     }

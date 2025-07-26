@@ -19,6 +19,7 @@ import com.chatappfrontend.designsystem.R
 
 @Composable
 fun RegisterScreen(
+    modifier: Modifier = Modifier,
     viewModel: RegisterViewModel = hiltViewModel(),
     navigateToLoginScreen: () -> Unit,
     onRegisterSuccess: (String) -> Unit
@@ -37,7 +38,7 @@ fun RegisterScreen(
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,

@@ -1,15 +1,14 @@
 package com.chatappfrontend.auth.viewmodel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chatappfrontend.auth.viewmodel.state.LoginUiState
 import com.chatappfrontend.auth.viewmodel.state.RegisterUiState
 import com.chatappfrontend.common.NetworkResult
 import com.chatappfrontend.common.UiEvent
 import com.chatappfrontend.domain.RegisterUserUseCase
+import com.chatappfrontend.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,16 +19,13 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val registerUserUseCase: RegisterUserUseCase,
-) : ViewModel() {
-
-    private val _uiEvent = MutableSharedFlow<UiEvent>()
-    val uiEvent: SharedFlow<UiEvent> = _uiEvent
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(value = RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
     fun registerUser() {
-//        if (validateInput()) return
+        if (validateInput()) return
         viewModelScope.launch {
             val result = registerUserUseCase.invoke(
                 email = uiState.value.email,
@@ -37,10 +33,14 @@ class RegisterViewModel @Inject constructor(
             )
             when (result) {
                 is NetworkResult.Success -> {
-                    _uiEvent.emit(value = UiEvent.Navigate("message_list"))
+                    emitUiEvent(event = UiEvent.Navigate("message_list"))
                 }
-                is NetworkResult.Error -> {}
-                is NetworkResult.Exception -> {}
+                is NetworkResult.Error -> {
+                    _uiState.update { it.copy(errorMessage = result.message) }
+                }
+                is NetworkResult.Exception -> {
+                    _uiState.update { it.copy(errorMessage = result.e.toString()) }
+                }
             }
         }
     }

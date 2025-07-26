@@ -5,23 +5,37 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.chatappfrontend.auth.viewmodel.LoginViewModel
+import com.chatappfrontend.common.UiEvent
 import com.chatappfrontend.designsystem.R
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    onLoginClicked: (String, String) -> Unit,
+    viewModel: LoginViewModel = hiltViewModel(),
+    onLoginSuccess: (String) -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is UiEvent.Navigate -> {
+                    onLoginSuccess(event.route)
+                }
+                is UiEvent.ShowSnackbar -> {}
+            }
+        }
+    }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -38,8 +52,8 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = uiState.email,
+            onValueChange = viewModel::setEmail,
             label = { Text(stringResource(id = R.string.email_label)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -49,8 +63,8 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
+            value = uiState.password,
+            onValueChange = viewModel::setPassword,
             label = { Text(stringResource(id = R.string.password_label)) },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -61,7 +75,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { onLoginClicked(email, password) },
+            onClick = viewModel::login,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(id = R.string.login_button))

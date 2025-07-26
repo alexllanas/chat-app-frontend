@@ -10,5 +10,10 @@ interface AuthRepository {
         password: String
     ): NetworkResult<User>
 
+    suspend fun login(
+        email: String,
+        password: String
+    ): NetworkResult<User>
+
     suspend fun logout(): Result
 }
