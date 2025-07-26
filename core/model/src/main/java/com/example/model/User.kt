@@ -1,6 +1,5 @@
 package com.example.model
 
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -14,5 +13,5 @@ data class User(
     val accessToken: String,
 
     @SerialName("created_at")
-    val createdAt: String,
+    val createdAt: String? = null,
 )

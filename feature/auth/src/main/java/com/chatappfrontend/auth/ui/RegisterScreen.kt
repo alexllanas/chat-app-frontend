@@ -15,8 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chatappfrontend.auth.viewmodel.RegisterViewModel
 import com.chatappfrontend.common.UiEvent
-import com.chatappfrontend.designsystem.R
-
+import com.example.common_android.R
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier,

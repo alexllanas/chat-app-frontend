@@ -1,16 +1,15 @@
 package com.chatappfrontend.data.repository
 
-import android.util.Log
 import com.chatappfrontend.common.NetworkResult
 import com.chatappfrontend.common.Result
 import com.example.model.User
 import com.example.network.CAFNetworkDataSource
-import com.example.security.TokenManager
+import com.example.security.DataStoreManager
 import javax.inject.Inject
 
 internal class DefaultAuthRepository @Inject constructor(
     private val network: CAFNetworkDataSource,
-    private val tokenManager: TokenManager
+    private val dataStoreManager: DataStoreManager
 ) : AuthRepository {
 
     override suspend fun registerUser(email: String, password: String): NetworkResult<User> {
@@ -22,7 +21,11 @@ internal class DefaultAuthRepository @Inject constructor(
             if (response.isSuccessful) {
                 val user = response.body()
                 if (user != null) {
-                    tokenManager.saveToken(user.accessToken)
+                    dataStoreManager.saveUserSession(
+                        accessToken = user.accessToken,
+                        userId = user.id,
+                        email = user.email
+                    )
                     NetworkResult.Success(user)
                 } else {
                     NetworkResult.Error(response.code(), "User registration failed: No user data returned")
@@ -45,7 +48,11 @@ internal class DefaultAuthRepository @Inject constructor(
             if (response.isSuccessful) {
                 val user = response.body()
                 if (user != null) {
-                    tokenManager.saveToken(user.accessToken)
+                    dataStoreManager.saveUserSession(
+                        accessToken = user.accessToken,
+                        userId = user.id,
+                        email = user.email
+                    )
                     NetworkResult.Success(user)
                 } else {
                     NetworkResult.Error(response.code(), "Login failed: No user data returned")
@@ -60,6 +67,6 @@ internal class DefaultAuthRepository @Inject constructor(
     }
 
     override suspend fun logout(): Result {
-        return tokenManager.clearToken()
+        return dataStoreManager.clearUserSession()
     }
 }

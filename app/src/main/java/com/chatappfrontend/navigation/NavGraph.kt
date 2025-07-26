@@ -1,25 +1,29 @@
 package com.chatappfrontend.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.chatappfrontend.auth.ui.LoginScreen
 import com.chatappfrontend.auth.ui.RegisterScreen
-import com.chatappfrontend.auth.viewmodel.LoginViewModel
 import com.example.messages.ui.MessageListScreen
 
 @Composable
 fun AppNavHost(
+    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-    NavHost(navController, startDestination = "login") {
+    NavHost(
+        modifier = modifier,
+        navController = navController,
+        startDestination = "login"
+    ) {
 
         composable("login") {
             LoginScreen(
-                onNavigateToRegister = {
+                onNavigateToSignUp = {
                     navController.navigate("register") {
                         popUpTo("login") { inclusive = false }
                     }

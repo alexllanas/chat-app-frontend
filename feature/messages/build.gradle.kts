@@ -77,7 +77,6 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:security"))
     implementation(project(":core:domain"))
-    implementation(project(":core:designsystem"))
 }
 
 kapt {
