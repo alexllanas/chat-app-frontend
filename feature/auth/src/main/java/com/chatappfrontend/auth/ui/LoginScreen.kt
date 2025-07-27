@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -16,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chatappfrontend.auth.viewmodel.LoginViewModel
 import com.chatappfrontend.auth.viewmodel.state.LoginUiState
 import com.chatappfrontend.common.UiEvent
+import com.chatappfrontend.ui.ErrorText
 import com.example.common_android.R
 
 @Composable
@@ -31,6 +33,7 @@ fun LoginScreen(
                 is UiEvent.Navigate -> {
                     onLoginSuccess(event.route)
                 }
+
                 is UiEvent.ShowSnackbar -> {}
             }
         }
@@ -62,6 +65,7 @@ private fun LoginScreenContent(
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(id = R.string.login_title),
@@ -100,34 +104,34 @@ private fun LoginScreenContent(
         Button(
             onClick = login,
             modifier = Modifier.fillMaxWidth(),
-            enabled = uiState.errorMessage == null || uiState.isLoading
+            enabled = !uiState.isLoading
         ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                )
-            } else {
-                Text(stringResource(id = R.string.login_button))
+            Box(
+                modifier = Modifier
+                    .height(36.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(32.dp),
+                        strokeWidth = 3.dp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.login_button),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // TextButton applies a default content padding: horizontal = 12.dp, vertical = dynamic
         TextButton(onClick = onNavigateToSignUp) {
             Text(stringResource(id = R.string.no_account_sign_up_prompt))
         }
-    }
-}
-
-@Composable
-private fun ErrorText(errorMessage: String?) {
-    if (errorMessage != null) {
-        Text(
-            text = errorMessage,
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyMedium
-        )
     }
 }
 
@@ -136,9 +140,9 @@ private fun ErrorText(errorMessage: String?) {
 fun LoginScreenPreview() {
     LoginScreenContent(
         uiState = LoginUiState(),
-        setEmail  = { _ -> },
+        setEmail = { _ -> },
         setPassword = { _ -> },
-        login = {} ,
+        login = {},
         onNavigateToSignUp = { },
     )
 }

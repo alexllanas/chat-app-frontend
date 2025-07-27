@@ -1,9 +1,10 @@
 package com.chatappfrontend.auth.viewmodel.state
 
 data class RegisterUiState(
-    val email: String = "",
-    val password: String = "",
-    val confirmPassword: String = "",
+    val username: String = "alex",
+    val email: String = "alex@example.com",
+    val password: String = "password",
+    val confirmPassword: String = "password",
     val isLoading: Boolean = false,
     val isRegistered: Boolean = false,
     val errorMessage: String? = null

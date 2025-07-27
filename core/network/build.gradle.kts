@@ -17,7 +17,16 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
+        debug {
+            buildConfigField("Boolean", "USE_REMOTE_SERVER", "false")
+            buildConfigField("String", "REMOTE_SERVER_URL", "\"http://52.15.221.75:3000/api/v1/\"")
+            buildConfigField("String", "LOCAL_SERVER_URL", "\"http://10.0.2.2:3000/api/v1/\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -64,5 +73,4 @@ dependencies {
 
     implementation(project(":core:common"))
     implementation(project(":core:security"))
-    implementation(project(":core:model"))
 }

@@ -1,8 +1,9 @@
 package com.example.messages.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.chatappfrontend.common.Result
+import com.chatappfrontend.common.ActionResult
 import com.chatappfrontend.common.UiEvent
+import com.chatappfrontend.common.navigation.Screen
 import com.chatappfrontend.domain.LogoutUseCase
 import com.chatappfrontend.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,12 +17,12 @@ class MessageListViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
-            val result = logoutUseCase.invoke()
-            when (result) {
-                is Result.Success -> {
-                    emitUiEvent(event = UiEvent.Navigate("login"))
-                }
-                is Result.Failure -> { }
+
+            try {
+                logoutUseCase.invoke()
+                emitUiEvent(event = UiEvent.Navigate(Screen.Login.route))
+            } catch (e: Exception) {
+//                emitUiEvent(event = UiEvent.ShowError(message = e.message ?: "An error occurred"))
             }
         }
     }

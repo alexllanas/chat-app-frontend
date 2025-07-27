@@ -1,8 +1,10 @@
 package com.example.network.retrofit
 
-import com.example.model.User
+import com.example.network.BuildConfig
 import com.example.network.CAFNetworkDataSource
-import com.example.network.model.RegisterRequest
+import com.example.network.model.LoginDto
+import com.example.network.model.RegisterDto
+import com.example.network.model.UserDto
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -10,8 +12,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.POST
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -19,10 +19,10 @@ import javax.inject.Singleton
 private interface RetrofitCAFNetworkApi {
 
      @POST("register")
-     suspend fun registerUser(@Body registerRequest: RegisterRequest): Response<User>
+     suspend fun registerUser(@Body registerDto: RegisterDto): Response<UserDto>
 
      @POST("login")
-     suspend fun login(@Body registerRequest: RegisterRequest): Response<User>
+     suspend fun login(@Body loginDto: LoginDto): Response<UserDto>
 
 }
 
@@ -32,10 +32,15 @@ internal class RetrofitCAFNetwork @Inject constructor(
     okHttpClient: OkHttpClient
 ) : CAFNetworkDataSource {
 
+    private val baseUrl = if (BuildConfig.USE_REMOTE_SERVER) {
+        BuildConfig.REMOTE_SERVER_URL
+    } else {
+        BuildConfig.LOCAL_SERVER_URL
+    }
+
     private val networkApi =
         Retrofit.Builder()
-//            .baseUrl("http://52.15.221.75:3000/api/v1/")
-            .baseUrl("http://10.0.2.2:3000/api/v1/")
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(
                 networkJson.asConverterFactory("application/json".toMediaType())
@@ -43,15 +48,22 @@ internal class RetrofitCAFNetwork @Inject constructor(
             .build()
             .create(RetrofitCAFNetworkApi::class.java)
 
-    override suspend fun registerUser(email: String, password: String): Response<User> {
+    override suspend fun registerUser(username: String, email: String, password: String): Response<UserDto> {
         return networkApi.registerUser(
-            registerRequest = RegisterRequest(email = email, password = password)
+            registerDto = RegisterDto(
+                username = username,
+                email = email,
+                password = password
+            )
         )
     }
 
-    override suspend fun login(email: String, password: String): Response<User> {
+    override suspend fun login(email: String, password: String): Response<UserDto> {
         return networkApi.login(
-            registerRequest = RegisterRequest(email = email, password = password)
+            loginDto = LoginDto(
+                email = email,
+                password = password
+            )
         )
     }
 }

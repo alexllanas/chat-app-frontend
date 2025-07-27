@@ -15,7 +15,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chatappfrontend.auth.viewmodel.RegisterViewModel
 import com.chatappfrontend.common.UiEvent
+import com.chatappfrontend.ui.ErrorText
 import com.example.common_android.R
+
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier,
@@ -28,10 +30,8 @@ fun RegisterScreen(
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is UiEvent.Navigate -> {
-                    onRegisterSuccess(event.route)
-                }
-                is UiEvent.ShowSnackbar -> {}
+                is UiEvent.Navigate -> onRegisterSuccess(event.route)
+                is UiEvent.ShowSnackbar -> {} // handle as needed
             }
         }
     }
@@ -50,6 +50,18 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // 🔹 Username field
+        OutlinedTextField(
+            value = uiState.username,
+            onValueChange = viewModel::setUsername,
+            label = { Text(stringResource(id = R.string.username_label)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Email
         OutlinedTextField(
             value = uiState.email,
             onValueChange = viewModel::setEmail,
@@ -61,6 +73,7 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Password
         OutlinedTextField(
             value = uiState.password,
             onValueChange = viewModel::setPassword,
@@ -73,6 +86,7 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Confirm Password
         OutlinedTextField(
             value = uiState.confirmPassword,
             onValueChange = viewModel::setConfirmPassword,
@@ -83,13 +97,36 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        ErrorText(errorMessage = uiState.errorMessage)
+
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
             onClick = viewModel::registerUser,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.isLoading
         ) {
-            Text(stringResource(id = R.string.signup_button))
+            Box(
+                modifier = Modifier
+                    .height(36.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(32.dp),
+                        strokeWidth = 3.dp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.signup_button),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

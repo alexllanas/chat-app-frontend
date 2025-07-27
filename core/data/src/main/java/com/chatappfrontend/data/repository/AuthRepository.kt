@@ -1,19 +1,19 @@
 package com.chatappfrontend.data.repository
 
-import com.chatappfrontend.common.NetworkResult
-import com.chatappfrontend.common.Result
-import com.example.model.User
+import com.chatappfrontend.common.ActionResult
+import com.chatappfrontend.data.model.User
 
 interface AuthRepository {
     suspend fun registerUser(
+        username: String,
         email: String,
         password: String
-    ): NetworkResult<User>
+    ): ActionResult<User>
 
     suspend fun login(
         email: String,
         password: String
-    ): NetworkResult<User>
+    ): ActionResult<User>
 
-    suspend fun logout(): Result
+    suspend fun logout()
 }

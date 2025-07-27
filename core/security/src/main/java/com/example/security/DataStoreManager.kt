@@ -4,13 +4,14 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.chatappfrontend.common.Result
+import com.chatappfrontend.common.ActionResult
 import com.example.security.di.DataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.jvm.Throws
 
 @Singleton
 class DataStoreManager @Inject constructor(
@@ -19,6 +20,7 @@ class DataStoreManager @Inject constructor(
     private val dataStore = context.DataStore
     private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
     private val USER_ID_KEY = stringPreferencesKey("user_id")
+    private val USERNAME_KEY = stringPreferencesKey("username")
     private val EMAIL_KEY = stringPreferencesKey("email")
 
     private suspend fun <T> saveEncryptedValue(
@@ -61,6 +63,14 @@ class DataStoreManager @Inject constructor(
         return getEncryptedValue(key = USER_ID_KEY)
     }
 
+    suspend fun saveUsername(username: String) {
+        saveEncryptedValue(key = USERNAME_KEY, value = username)
+    }
+
+    suspend fun getUsername(): String? {
+        return getEncryptedValue(key = USERNAME_KEY)
+    }
+
     suspend fun saveEmail(email: String) {
         saveEncryptedValue(key = EMAIL_KEY, value = email)
     }
@@ -84,28 +94,30 @@ class DataStoreManager @Inject constructor(
     suspend fun saveUserSession(
         accessToken: String,
         userId: String,
+        username: String,
         email: String
-    ): Result {
+    ): ActionResult<Unit> {
         return try {
             saveAccessToken(accessToken = accessToken)
             saveUserId(userId = userId)
+            saveUsername(username = username)
             saveEmail(email = email)
-            Result.Success
+            ActionResult.Success(Unit)
         } catch (e: Exception) {
-            Result.Failure(e.message ?: "Failed to save session")
+            ActionResult.Exception(e)
         }
     }
 
-    suspend fun clearUserSession(): Result {
+    suspend fun clearUserSession() {
         try {
             clearKeys(
                 ACCESS_TOKEN_KEY,
                 USER_ID_KEY,
+                USERNAME_KEY,
                 EMAIL_KEY
             )
         } catch (e: Exception) {
-            return Result.Failure(e.message ?: "Failed to clear session")
+            throw RuntimeException("Failed to clear user session: ${e.message}", e)
         }
-        return Result.Success
     }
 }

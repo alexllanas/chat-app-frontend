@@ -1,9 +1,10 @@
 package com.chatappfrontend.data.repository
 
-import com.chatappfrontend.common.NetworkResult
-import com.chatappfrontend.common.Result
-import com.example.model.User
+import com.chatappfrontend.common.ActionResult
+import com.chatappfrontend.data.model.User
+import com.chatappfrontend.data.model.mapper.toUser
 import com.example.network.CAFNetworkDataSource
+import com.example.network.NetworkResponseParser
 import com.example.security.DataStoreManager
 import javax.inject.Inject
 
@@ -12,61 +13,66 @@ internal class DefaultAuthRepository @Inject constructor(
     private val dataStoreManager: DataStoreManager
 ) : AuthRepository {
 
-    override suspend fun registerUser(email: String, password: String): NetworkResult<User> {
+    override suspend fun registerUser(username: String, email: String, password: String): ActionResult<User> {
         val result = try {
             val response = network.registerUser(
+                username = username,
                 email = email,
                 password = password
             )
             if (response.isSuccessful) {
-                val user = response.body()
-                if (user != null) {
+                val userDto = response.body()
+                if (userDto != null) {
                     dataStoreManager.saveUserSession(
-                        accessToken = user.accessToken,
-                        userId = user.id,
-                        email = user.email
+                        accessToken = userDto.accessToken,
+                        userId = userDto.id,
+                        username = userDto.username,
+                        email = userDto.email
                     )
-                    NetworkResult.Success(user)
+                    val user = userDto.toUser()
+                    ActionResult.Success(user)
                 } else {
-                    NetworkResult.Error(response.code(), "User registration failed: No user data returned")
+                    ActionResult.Error(response.code(), NetworkResponseParser.getErrorMessage(response))
                 }
             } else {
-                NetworkResult.Error(response.code(), "User registration failed: ${response.errorBody()?.string() ?: "Unknown error"}")
+                ActionResult.Error(response.code(), NetworkResponseParser.getErrorMessage(response))
             }
         } catch (e: Exception) {
-            NetworkResult.Exception(e)
+            ActionResult.Exception(e)
         }
         return result
     }
 
-    override suspend fun login(email: String, password: String): NetworkResult<User> {
+    override suspend fun login(email: String, password: String): ActionResult<User> {
         val result = try {
             val response = network.login(
                 email = email,
                 password = password
             )
             if (response.isSuccessful) {
-                val user = response.body()
-                if (user != null) {
+                val userDto = response.body()
+                if (userDto != null) {
                     dataStoreManager.saveUserSession(
-                        accessToken = user.accessToken,
-                        userId = user.id,
-                        email = user.email
+                        accessToken = userDto.accessToken,
+                        username = userDto.username,
+                        userId = userDto.id,
+                        email = userDto.email
                     )
-                    NetworkResult.Success(user)
+                    val user = userDto.toUser()
+                    ActionResult.Success(user)
                 } else {
-                    NetworkResult.Error(response.code(), "Login failed: No user data returned")
+                    ActionResult.Error(response.code(), NetworkResponseParser.getErrorMessage(response))
                 }
             } else {
-                NetworkResult.Error(response.code(), "Login failed: ${response.errorBody()?.string() ?: "Unknown error"}")
+                ActionResult.Error(response.code(), NetworkResponseParser.getErrorMessage(response))
             }
         } catch (e: Exception) {
-            NetworkResult.Exception(e)
+            ActionResult.Exception(e)
         }
         return result
     }
 
-    override suspend fun logout(): Result {
-        return dataStoreManager.clearUserSession()
+    override suspend fun logout() {
+        dataStoreManager.clearUserSession()
     }
 }

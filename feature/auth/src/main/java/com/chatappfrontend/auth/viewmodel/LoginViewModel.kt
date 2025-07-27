@@ -3,7 +3,7 @@ package com.chatappfrontend.auth.viewmodel
 import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import com.chatappfrontend.auth.viewmodel.state.LoginUiState
-import com.chatappfrontend.common.NetworkResult
+import com.chatappfrontend.common.ActionResult
 import com.chatappfrontend.common.UiEvent
 import com.chatappfrontend.domain.LoginUseCase
 import com.chatappfrontend.ui.BaseViewModel
@@ -30,9 +30,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             val errorMessage = getErrorMessage()
             if (errorMessage != null) {
-                _uiState.update {
-                    it.copy(errorMessage = errorMessage)
-                }
+                _uiState.update { it.copy(errorMessage = errorMessage) }
                 return@launch
             }
 
@@ -46,19 +44,21 @@ class LoginViewModel @Inject constructor(
             )
 
             when (result) {
-                is NetworkResult.Success -> {
+                is ActionResult.Success -> {
                     emitUiEvent(event = UiEvent.Navigate("message_list"))
                 }
-                is NetworkResult.Error -> {
+                is ActionResult.Error -> {
                     _uiState.update {   // failed to login
                         it.copy(isLoading = false, errorMessage = result.message)
                     }
                 }
-                is NetworkResult.Exception -> {
+                is ActionResult.Exception -> {
                     _uiState.update {   // unexpected error
-                        it.copy(isLoading = false, errorMessage = result.e.toString())
+                        it.copy(isLoading = false, errorMessage = result.exception.message)
                     }
                 }
+
+                ActionResult.Ignored -> { }
             }
         }
     }
@@ -67,9 +67,7 @@ class LoginViewModel @Inject constructor(
         return when {
             email.isBlank() && password.isBlank() -> stringProvider.getString(R.string.error_email_password_empty)
             email.isBlank() -> stringProvider.getString(R.string.error_email_empty)
-            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> stringProvider.getString(R.string.error_invalid_email)
             password.isBlank() -> stringProvider.getString(R.string.error_password_empty)
-            password.length < 6 -> stringProvider.getString(R.string.error_password_short)
             else -> null
         }
     }

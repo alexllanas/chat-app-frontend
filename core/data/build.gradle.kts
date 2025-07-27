@@ -59,6 +59,5 @@ dependencies {
 
     implementation(project(":core:common"))
     implementation(project(":core:security"))
-    implementation(project(":core:model"))
     implementation(project(":core:network"))
 }
