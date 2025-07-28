@@ -1,4 +1,4 @@
-package com.chatappfrontend.data.model
+package com.chatappfrontend.domain.model
 
 data class User(
     val id: String,

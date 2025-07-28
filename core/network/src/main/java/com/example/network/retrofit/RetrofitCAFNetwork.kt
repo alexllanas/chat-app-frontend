@@ -27,7 +27,7 @@ private interface RetrofitCAFNetworkApi {
 }
 
 @Singleton
-internal class RetrofitCAFNetwork @Inject constructor(
+class RetrofitCAFNetwork @Inject constructor(
     networkJson: Json,
     okHttpClient: OkHttpClient
 ) : CAFNetworkDataSource {

@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal interface ApiModule {
+interface ApiModule {
 
     @Binds
     fun binds(impl: RetrofitCAFNetwork) : CAFNetworkDataSource

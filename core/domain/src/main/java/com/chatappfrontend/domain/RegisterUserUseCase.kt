@@ -1,8 +1,8 @@
 package com.chatappfrontend.domain
 
 import com.chatappfrontend.common.ActionResult
-import com.chatappfrontend.data.model.User
-import com.chatappfrontend.data.repository.AuthRepository
+import com.chatappfrontend.domain.model.User
+import com.chatappfrontend.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class RegisterUserUseCase @Inject constructor(

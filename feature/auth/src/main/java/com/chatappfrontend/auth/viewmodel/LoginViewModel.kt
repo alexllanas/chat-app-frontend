@@ -1,6 +1,5 @@
 package com.chatappfrontend.auth.viewmodel
 
-import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import com.chatappfrontend.auth.viewmodel.state.LoginUiState
 import com.chatappfrontend.common.ActionResult

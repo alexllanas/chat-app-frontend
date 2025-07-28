@@ -1,14 +1,15 @@
 package com.chatappfrontend.data.repository
 
 import com.chatappfrontend.common.ActionResult
-import com.chatappfrontend.data.model.User
-import com.chatappfrontend.data.model.mapper.toUser
+import com.chatappfrontend.domain.model.User
+import com.chatappfrontend.data.mapper.toUser
+import com.chatappfrontend.domain.repository.AuthRepository
 import com.example.network.CAFNetworkDataSource
-import com.example.network.NetworkResponseParser
+import com.example.network.utils.ResponseErrorParser
 import com.example.security.DataStoreManager
 import javax.inject.Inject
 
-internal class DefaultAuthRepository @Inject constructor(
+class DefaultAuthRepository @Inject constructor(
     private val network: CAFNetworkDataSource,
     private val dataStoreManager: DataStoreManager
 ) : AuthRepository {
@@ -32,10 +33,10 @@ internal class DefaultAuthRepository @Inject constructor(
                     val user = userDto.toUser()
                     ActionResult.Success(user)
                 } else {
-                    ActionResult.Error(response.code(), NetworkResponseParser.getErrorMessage(response))
+                    ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
                 }
             } else {
-                ActionResult.Error(response.code(), NetworkResponseParser.getErrorMessage(response))
+                ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
             }
         } catch (e: Exception) {
             ActionResult.Exception(e)
@@ -61,10 +62,10 @@ internal class DefaultAuthRepository @Inject constructor(
                     val user = userDto.toUser()
                     ActionResult.Success(user)
                 } else {
-                    ActionResult.Error(response.code(), NetworkResponseParser.getErrorMessage(response))
+                    ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
                 }
             } else {
-                ActionResult.Error(response.code(), NetworkResponseParser.getErrorMessage(response))
+                ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
             }
         } catch (e: Exception) {
             ActionResult.Exception(e)

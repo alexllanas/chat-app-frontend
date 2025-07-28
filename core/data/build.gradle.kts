@@ -56,8 +56,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit)
 
     implementation(project(":core:common"))
     implementation(project(":core:security"))
     implementation(project(":core:network"))
+    implementation(project(":core:domain"))
 }

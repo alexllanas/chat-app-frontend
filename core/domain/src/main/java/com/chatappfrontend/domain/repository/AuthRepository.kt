@@ -1,7 +1,7 @@
-package com.chatappfrontend.data.repository
+package com.chatappfrontend.domain.repository
 
 import com.chatappfrontend.common.ActionResult
-import com.chatappfrontend.data.model.User
+import com.chatappfrontend.domain.model.User
 
 interface AuthRepository {
     suspend fun registerUser(

@@ -1,6 +1,6 @@
-package com.chatappfrontend.data.model.mapper
+package com.chatappfrontend.data.mapper
 
-import com.chatappfrontend.data.model.User
+import com.chatappfrontend.domain.model.User
 import com.example.network.model.UserDto
 
 fun UserDto.toUser() = User(
