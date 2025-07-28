@@ -9,7 +9,9 @@ import androidx.navigation.compose.rememberNavController
 import com.chatappfrontend.auth.ui.LoginScreen
 import com.chatappfrontend.auth.ui.RegisterScreen
 import com.chatappfrontend.common.navigation.Screen
-import com.example.messages.ui.MessageListScreen
+import com.example.messages.ui.ConversationListScreen
+import com.example.messages.ui.ConversationScreen
+import com.example.messages.ui.NewMessageScreen
 
 @Composable
 fun AppNavHost(
@@ -19,9 +21,8 @@ fun AppNavHost(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = "register"
+        startDestination = Screen.Login.route
     ) {
-
         composable(Screen.Login.route) {
             LoginScreen(
                 onNavigateToSignUp = {
@@ -46,12 +47,41 @@ fun AppNavHost(
             )
         }
 
-        composable(Screen.MessageList.route) {
-             MessageListScreen(
-                 onLogout = { route ->
-                     navController.navigate(route)
-                 }
-             )
+        composable(Screen.ConversationList.route) {
+            ConversationListScreen(
+                onNewMessageClick = {
+                    navController.navigate(Screen.NewMessage.route)
+                },
+                onConversationClick = { userId ->
+                    navController.navigate("conversation/$userId")
+                },
+                onLogout = { route ->
+                    navController.navigate(route)
+                }
+            )
+        }
+
+        composable(Screen.NewMessage.route) {
+            NewMessageScreen(
+                navigateToConversation = { userId ->
+                    navController.navigate("conversation/$userId")
+                },
+                onBackPressed = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Conversation.route) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+            if (userId != null) {
+                ConversationScreen(
+                    userId = userId,
+                    onBackPressed = {
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
     }
 }

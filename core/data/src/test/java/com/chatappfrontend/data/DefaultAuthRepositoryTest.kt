@@ -3,7 +3,7 @@ package com.chatappfrontend.data
 import com.chatappfrontend.common.ActionResult
 import com.chatappfrontend.data.repository.DefaultAuthRepository
 import com.example.network.CAFNetworkDataSource
-import com.example.network.model.UserDto
+import com.example.network.model.AuthenticatedUserDto
 import com.example.security.DataStoreManager
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -44,13 +44,13 @@ class DefaultAuthRepositoryTest {
 
     @Test
     fun `registerUser should return Success when network response is successful`() = runTest {
-        val dummyUserDto = UserDto(
+        val dummyAuthenticatedUserDto = AuthenticatedUserDto(
             id = "123", username = "testuser", email = "test@example.com", accessToken = "abc123"
         )
 
         coEvery {
             network.registerUser("testuser", "test@example.com", "password")
-        } returns Response.success(dummyUserDto)
+        } returns Response.success(dummyAuthenticatedUserDto)
 
         val result = repository.registerUser("testuser", "test@example.com", "password")
 
@@ -71,7 +71,7 @@ class DefaultAuthRepositoryTest {
     @Test
     fun `registerUser should return Error when response is not successful`() = runTest {
         val errorJson = """{"error":"Email exists"}"""
-        val errorResponse = Response.error<UserDto>(
+        val errorResponse = Response.error<AuthenticatedUserDto>(
             400,
             errorJson.toResponseBody("application/json".toMediaTypeOrNull())
         )
@@ -97,11 +97,11 @@ class DefaultAuthRepositoryTest {
 
     @Test
     fun `login should return Success when response is successful`() = runTest {
-        val dummyUserDto = UserDto("456", "anotheruser", "another@example.com", "token456")
+        val dummyAuthenticatedUserDto = AuthenticatedUserDto("456", "anotheruser", "another@example.com", "token456")
 
         coEvery {
             network.login("another@example.com", "pass")
-        } returns Response.success(dummyUserDto)
+        } returns Response.success(dummyAuthenticatedUserDto)
 
         val result = repository.login("another@example.com", "pass")
 

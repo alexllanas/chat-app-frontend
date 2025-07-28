@@ -4,10 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserDto(
-    val id: String,
-
-    val username: String,
-
-    val email: String
+data class UsersDto(
+    val users: List<UserDto>
 )

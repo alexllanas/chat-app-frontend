@@ -16,4 +16,6 @@ interface AuthRepository {
     ): ActionResult<User>
 
     suspend fun logout()
+
+    suspend fun getUsers(): ActionResult<List<User>>
 }

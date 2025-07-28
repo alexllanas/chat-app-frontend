@@ -44,7 +44,7 @@ class LoginViewModel @Inject constructor(
 
             when (result) {
                 is ActionResult.Success -> {
-                    emitUiEvent(event = UiEvent.Navigate("message_list"))
+                    emitUiEvent(event = UiEvent.Navigate("conversation_list"))
                 }
                 is ActionResult.Error -> {
                     _uiState.update {   // failed to login

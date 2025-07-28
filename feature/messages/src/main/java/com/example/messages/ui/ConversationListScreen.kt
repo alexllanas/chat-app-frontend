@@ -1,9 +1,8 @@
+
 package com.example.messages.ui
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,11 +14,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,89 +37,23 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.chatappfrontend.common.UiEvent
 import com.example.messages.R
-import com.example.messages.viewmodel.MessageListViewModel
+import com.example.messages.viewmodel.ConversationListViewModel
 
 @Composable
-fun MessageListScreen(
+fun ConversationListScreen(
     modifier: Modifier = Modifier,
-    viewModel: MessageListViewModel = hiltViewModel(),
+    viewModel: ConversationListViewModel = hiltViewModel(),
+    onNewMessageClick: () -> Unit,
+    onConversationClick: (String) -> Unit,
     onLogout: (String) -> Unit,
 ) {
 
-    val list = listOf(
-        "alex",
-        "james",
-        "sarah",
-        "john",
-        "stephanie",
-        "michael",
-        "linda",
-        "david",
-        "emma",
-        "oliver",
-        "alex",
-        "mags",
-        "olive",
-        "james",
-        "sarah",
-        "john",
-        "stephanie",
-        "michael",
-        "linda",
-        "david",
-        "emma",
-        "oliver",
-        "alex",
-        "mags",
-        "olive",
-        "james",
-        "sarah",
-        "john",
-        "stephanie",
-        "michael",
-        "linda",
-        "david",
-        "emma",
-        "oliver",
-        "alex",
-        "mags",
-        "olive",
-        "james",
-        "sarah",
-        "john",
-        "stephanie",
-        "michael",
-        "linda",
-        "david",
-        "emma",
-        "oliver",
-        "alex",
-        "mags",
-        "olive",
-        "james",
-        "sarah",
-        "john",
-        "stephanie",
-        "michael",
-        "linda",
-        "david",
-        "emma",
-        "oliver",
-        "alex",
-        "mags",
-        "olive",
-        "james",
-        "sarah",
-        "john",
-        "stephanie",
-        "michael",
-        "linda",
-        "david",
-        "emma",
-        "oliver"
-    )
+    val uiState by viewModel.uiState.collectAsState()
+
 
     LaunchedEffect(Unit) {
+        viewModel.getUsers()
+
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UiEvent.Navigate -> {
@@ -124,27 +64,46 @@ fun MessageListScreen(
             }
         }
     }
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        item {
-            TextButton(
-                onClick = viewModel::logout,
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onNewMessageClick
             ) {
-                Text("Logout")
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "New Message"
+                )
             }
         }
-        items(list) { item ->
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+        ) {
+            item {
+                TextButton(
+                    onClick = viewModel::logout,
+                ) {
+                    Text("Logout")
+                }
+            }
+            items(uiState.users) { user ->
 
-            ConversationItem(
-                profileImage = painterResource(R.drawable.round_account_circle_24),
-                contactName = item,
-                lastMessage = "Last message from $item Last message from $item",
-                date = "Today"
-            )
+                ConversationItem(
+                    modifier = Modifier
+                        .clickable {
+                            onConversationClick(user.username)
+                        },
+                    profileImage = painterResource(R.drawable.round_account_circle_24),
+                    contactName = user.username,
+                    lastMessage = "Last message from ${user.username} Last message from person",
+                    date = "Today"
+                )
+            }
         }
+
     }
 }
 
@@ -154,7 +113,7 @@ fun ConversationItem(
     modifier: Modifier = Modifier,
     contactName: String,
     lastMessage: String,
-    date: String,
+    date: String
 ) {
     Row(
         modifier = modifier

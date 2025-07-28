@@ -13,7 +13,6 @@ internal fun CAFAppScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
     ) {
         AppNavHost()
     }

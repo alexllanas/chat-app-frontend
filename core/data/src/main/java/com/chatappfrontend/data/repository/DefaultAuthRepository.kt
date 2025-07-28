@@ -76,4 +76,24 @@ class DefaultAuthRepository @Inject constructor(
     override suspend fun logout() {
         dataStoreManager.clearUserSession()
     }
+
+    override suspend fun getUsers(): ActionResult<List<User>> {
+        val result = try {
+            val response = network.getUsers()
+            if (response.isSuccessful) {
+                val userDtos = response.body()
+                if (userDtos != null) {
+                    val users = userDtos.users.map { it.toUser() }
+                    ActionResult.Success(users)
+                } else {
+                    ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
+                }
+            } else {
+                ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
+            }
+        } catch (e: Exception) {
+            ActionResult.Exception(e)
+        }
+        return result
+    }
 }

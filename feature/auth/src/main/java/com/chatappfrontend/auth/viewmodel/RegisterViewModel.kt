@@ -48,7 +48,7 @@ class RegisterViewModel @Inject constructor(
 
             when (result) {
                 is ActionResult.Success -> {
-                    emitUiEvent(event = UiEvent.Navigate(Screen.MessageList.route))
+                    emitUiEvent(event = UiEvent.Navigate(Screen.ConversationList.route))
                 }
                 is ActionResult.Error -> {
                     if (result.code == 409)
