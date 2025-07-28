@@ -35,4 +35,4 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run Unit Tests
-        run: ./gradlew :core:data:testDebugUnitTest --info
+        run: ./gradlew testDebugUnitTest
