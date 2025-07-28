@@ -10,16 +10,11 @@ import com.chatappfrontend.navigation.AppNavHost
 
 @Composable
 internal fun CAFAppScreen() {
-
-    Scaffold { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            AppNavHost()
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+    ) {
+        AppNavHost()
     }
-
-
 }

@@ -70,7 +70,7 @@ class DefaultAuthRepositoryTest {
 
     @Test
     fun `registerUser should return Error when response is not successful`() = runTest {
-        val errorJson = """{"error":"Email aaexists"}"""
+        val errorJson = """{"error":"Email exists"}"""
         val errorResponse = Response.error<UserDto>(
             400,
             errorJson.toResponseBody("application/json".toMediaTypeOrNull())
