@@ -4,14 +4,14 @@ import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.chatappfrontend.common.ActionResult
+import com.chatappfrontend.common.ResultWrapper
 import com.example.security.di.DataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import java.sql.Timestamp
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.jvm.Throws
 
 @Singleton
 class DataStoreManager @Inject constructor(
@@ -22,6 +22,8 @@ class DataStoreManager @Inject constructor(
     private val USER_ID_KEY = stringPreferencesKey("user_id")
     private val USERNAME_KEY = stringPreferencesKey("username")
     private val EMAIL_KEY = stringPreferencesKey("email")
+    private val LAST_LOGIN_KEY = stringPreferencesKey("last_login")
+    private val CREATED_AT_KEY = stringPreferencesKey("created_at")
 
     private suspend fun <T> saveEncryptedValue(
         key: Preferences.Key<String>,
@@ -76,7 +78,18 @@ class DataStoreManager @Inject constructor(
     }
 
     suspend fun getEmail(): String? {
-        return getEncryptedValue(EMAIL_KEY)
+        return getEncryptedValue(key = EMAIL_KEY)
+    }
+
+    suspend fun saveLastLogin(timestamp: String) {
+        saveEncryptedValue(
+            key = LAST_LOGIN_KEY,
+            value = timestamp
+        )
+    }
+
+    suspend fun getLastLogin(): String? {
+        return getEncryptedValue(key = LAST_LOGIN_KEY)
     }
 
     private suspend fun clearKeys(vararg keys: Preferences.Key<*>) {
@@ -92,20 +105,37 @@ class DataStoreManager @Inject constructor(
     }
 
     suspend fun saveUserSession(
-        accessToken: String,
         userId: String,
         username: String,
-        email: String
-    ): ActionResult<Unit> {
+        email: String,
+        accessToken: String,
+        lastLogin: String,
+        createdAt: String? = null
+    ): ResultWrapper<Unit> {
         return try {
-            saveAccessToken(accessToken = accessToken)
             saveUserId(userId = userId)
             saveUsername(username = username)
             saveEmail(email = email)
-            ActionResult.Success(Unit)
+            saveAccessToken(accessToken = accessToken)
+            saveLastLogin(timestamp = lastLogin)
+            createdAt?.let { timestamp ->
+                saveCreatedAt(timestamp = timestamp)
+            }
+            ResultWrapper.Success(Unit)
         } catch (e: Exception) {
-            ActionResult.Exception(e)
+            ResultWrapper.Exception(e)
         }
+    }
+
+    suspend fun saveCreatedAt(timestamp: String) {
+        saveEncryptedValue(
+            key = CREATED_AT_KEY,
+            value = timestamp
+        )
+    }
+
+    suspend fun getCreatedAt(): String? {
+        return getEncryptedValue(key = CREATED_AT_KEY)
     }
 
     suspend fun clearUserSession() {
@@ -114,7 +144,9 @@ class DataStoreManager @Inject constructor(
                 ACCESS_TOKEN_KEY,
                 USER_ID_KEY,
                 USERNAME_KEY,
-                EMAIL_KEY
+                EMAIL_KEY,
+                LAST_LOGIN_KEY,
+                CREATED_AT_KEY
             )
         } catch (e: Exception) {
             throw RuntimeException("Failed to clear user session: ${e.message}", e)

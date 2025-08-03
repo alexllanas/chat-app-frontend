@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.chat_app_frontend"
-        minSdk = 24
+        minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 1
@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.okhttp)
+    implementation(libs.kotlinx.serialization.json)
 
     // Navigation
     implementation(libs.navigation)
@@ -86,7 +87,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":feature:auth"))
     implementation(project(":feature:messages"))
-    implementation(project(":feature:messages"))
+    implementation(project(":core:domain"))
 }
 
 kapt {

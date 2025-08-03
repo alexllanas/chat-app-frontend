@@ -2,7 +2,7 @@ package com.chatappfrontend.auth.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.chatappfrontend.auth.viewmodel.state.LoginUiState
-import com.chatappfrontend.common.ActionResult
+import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.common.UiEvent
 import com.chatappfrontend.domain.LoginUseCase
 import com.chatappfrontend.ui.BaseViewModel
@@ -43,21 +43,21 @@ class LoginViewModel @Inject constructor(
             )
 
             when (result) {
-                is ActionResult.Success -> {
-                    emitUiEvent(event = UiEvent.Navigate("conversation_list"))
+                is ResultWrapper.Success -> {
+                    emitUiEvent(event = UiEvent.Navigate("chat_list"))
                 }
-                is ActionResult.Error -> {
+                is ResultWrapper.Error -> {
                     _uiState.update {   // failed to login
                         it.copy(isLoading = false, errorMessage = result.message)
                     }
                 }
-                is ActionResult.Exception -> {
+                is ResultWrapper.Exception -> {
                     _uiState.update {   // unexpected error
                         it.copy(isLoading = false, errorMessage = result.exception.message)
                     }
                 }
 
-                ActionResult.Ignored -> { }
+                ResultWrapper.Ignored -> { }
             }
         }
     }

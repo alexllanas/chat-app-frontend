@@ -3,7 +3,7 @@ package com.chatappfrontend.auth.viewmodel
 import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import com.chatappfrontend.auth.viewmodel.state.RegisterUiState
-import com.chatappfrontend.common.ActionResult
+import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.common.UiEvent
 import com.chatappfrontend.common.navigation.Screen
 import com.chatappfrontend.common_android.StringProvider
@@ -47,17 +47,17 @@ class RegisterViewModel @Inject constructor(
             )
 
             when (result) {
-                is ActionResult.Success -> {
-                    emitUiEvent(event = UiEvent.Navigate(Screen.ConversationList.route))
+                is ResultWrapper.Success -> {
+                    emitUiEvent(event = UiEvent.Navigate(Screen.ChatList.route))
                 }
-                is ActionResult.Error -> {
+                is ResultWrapper.Error -> {
                     if (result.code == 409)
                     _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
                 }
-                is ActionResult.Exception -> {
+                is ResultWrapper.Exception -> {
                     _uiState.update { it.copy(isLoading = false, errorMessage = result.exception.message) }
                 }
-                ActionResult.Ignored -> {}
+                ResultWrapper.Ignored -> {}
             }
         }
     }

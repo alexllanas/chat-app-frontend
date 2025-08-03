@@ -1,9 +1,9 @@
 package com.chatappfrontend.data
 
-import com.chatappfrontend.common.ActionResult
+import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.data.repository.DefaultAuthRepository
 import com.example.network.CAFNetworkDataSource
-import com.example.network.model.AuthenticatedUserDto
+import com.example.network.model.AuthenticationResponseDTO
 import com.example.security.DataStoreManager
 import io.mockk.Runs
 import io.mockk.coEvery
@@ -44,18 +44,22 @@ class DefaultAuthRepositoryTest {
 
     @Test
     fun `registerUser should return Success when network response is successful`() = runTest {
-        val dummyAuthenticatedUserDto = AuthenticatedUserDto(
-            id = "123", username = "testuser", email = "test@example.com", accessToken = "abc123"
+        val dummyAuthenticationResponseDTO = AuthenticationResponseDTO(
+            id = "123",
+            username = "testuser",
+            email = "test@example.com",
+            accessToken = "abc123",
+            lastLogin = "2023-10-01T12:00:00Z"
         )
 
         coEvery {
             network.registerUser("testuser", "test@example.com", "password")
-        } returns Response.success(dummyAuthenticatedUserDto)
+        } returns Response.success(dummyAuthenticationResponseDTO)
 
         val result = repository.registerUser("testuser", "test@example.com", "password")
 
-        assertTrue(result is ActionResult.Success)
-        val user = (result as ActionResult.Success).data
+        assertTrue(result is ResultWrapper.Success)
+        val user = (result as ResultWrapper.Success).data
         assertEquals("testuser", user.username)
 
         coVerify {
@@ -63,7 +67,8 @@ class DefaultAuthRepositoryTest {
                 accessToken = "abc123",
                 userId = "123",
                 username = "testuser",
-                email = "test@example.com"
+                email = "test@example.com",
+                lastLogin = "2023-10-01T12:00:00Z"
             )
         }
     }
@@ -71,7 +76,7 @@ class DefaultAuthRepositoryTest {
     @Test
     fun `registerUser should return Error when response is not successful`() = runTest {
         val errorJson = """{"error":"Email exists"}"""
-        val errorResponse = Response.error<AuthenticatedUserDto>(
+        val errorResponse = Response.error<AuthenticationResponseDTO>(
             400,
             errorJson.toResponseBody("application/json".toMediaTypeOrNull())
         )
@@ -80,7 +85,7 @@ class DefaultAuthRepositoryTest {
 
         val result = repository.registerUser("alex", "test@example.com", "password123")
 
-        assertEquals("Email exists", (result as ActionResult.Error).message)
+        assertEquals("Email exists", (result as ResultWrapper.Error).message)
     }
 
     @Test
@@ -91,22 +96,28 @@ class DefaultAuthRepositoryTest {
 
         val result = repository.registerUser("testuser", "test@example.com", "password")
 
-        assertTrue(result is ActionResult.Exception)
-        assertEquals("Network failure", (result as ActionResult.Exception).exception.message)
+        assertTrue(result is ResultWrapper.Exception)
+        assertEquals("Network failure", (result as ResultWrapper.Exception).exception.message)
     }
 
     @Test
     fun `login should return Success when response is successful`() = runTest {
-        val dummyAuthenticatedUserDto = AuthenticatedUserDto("456", "anotheruser", "another@example.com", "token456")
+        val dummyAuthenticationResponseDTO = AuthenticationResponseDTO(
+            id = "456",
+            username = "anotheruser",
+            email = "another@example.com",
+            accessToken = "token456",
+            lastLogin = "2023-10-01T12:00:00Z"
+        )
 
         coEvery {
             network.login("another@example.com", "pass")
-        } returns Response.success(dummyAuthenticatedUserDto)
+        } returns Response.success(dummyAuthenticationResponseDTO)
 
         val result = repository.login("another@example.com", "pass")
 
-        assertTrue(result is ActionResult.Success)
-        assertEquals("anotheruser", (result as ActionResult.Success).data.username)
+        assertTrue(result is ResultWrapper.Success)
+        assertEquals("anotheruser", (result as ResultWrapper.Success).data.username)
     }
 
     @Test

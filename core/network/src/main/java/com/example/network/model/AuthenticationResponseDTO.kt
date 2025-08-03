@@ -4,16 +4,22 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AuthenticatedUserDto(
+data class AuthenticationResponseDTO(
+    @SerialName("id")
     val id: String,
 
+    @SerialName("username")
     val username: String,
 
+    @SerialName("email")
     val email: String,
 
-    @SerialName("access_token")
+    @SerialName("accessToken")
     val accessToken: String,
 
-    @SerialName("created_at")
+    @SerialName("lastLogin")
+    val lastLogin: String?,
+
+    @SerialName("createdAt")
     val createdAt: String? = null
 )

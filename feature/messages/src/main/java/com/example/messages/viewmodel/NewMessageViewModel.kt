@@ -1,10 +1,9 @@
 package com.example.messages.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.chatappfrontend.common.ActionResult
-import com.chatappfrontend.common.UiEvent
-import com.chatappfrontend.common.navigation.Screen
+import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.domain.GetUsersUseCase
+import com.chatappfrontend.domain.model.User
 import com.chatappfrontend.ui.BaseViewModel
 import com.example.messages.state.NewMessageUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
-    private val getUsersUseCase: GetUsersUseCase
+    private val getUsersUseCase: GetUsersUseCase,
+
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(value = NewMessageUiState())
@@ -27,16 +27,16 @@ class NewMessageViewModel @Inject constructor(
             try {
                 val result = getUsersUseCase.invoke()
                 when (result) {
-                    is ActionResult.Success -> {
+                    is ResultWrapper.Success -> {
                         _uiState.value = _uiState.value.copy(users = result.data)
                     }
-                    is ActionResult.Error -> {
+                    is ResultWrapper.Error -> {
 //                        emitUiEvent(event = UiEvent.ShowError(message = result.message ?: "An error occurred"))
                     }
-                    is ActionResult.Exception -> {
+                    is ResultWrapper.Exception -> {
 //                        emitUiEvent(event = UiEvent.ShowError(message = result.exception.message ?: "An error occurred"))
                     }
-                    ActionResult.Ignored -> {}
+                    ResultWrapper.Ignored -> {}
                 }
             } catch (e: Exception) {
 //                emitUiEvent(event = UiEvent.ShowError(message = e.message ?: "An error occurred"))

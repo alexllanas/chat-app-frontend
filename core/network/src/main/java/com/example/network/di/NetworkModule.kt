@@ -1,7 +1,6 @@
 package com.example.network.di
 
 import com.example.network.AuthInterceptor
-import com.example.network.utils.ResponseErrorParser
 import com.example.security.DataStoreManager
 import dagger.Module
 import dagger.Provides

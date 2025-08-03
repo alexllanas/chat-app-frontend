@@ -1,15 +1,15 @@
 package com.chatappfrontend.domain
 
-import com.chatappfrontend.common.ActionResult
+import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.domain.model.User
-import com.chatappfrontend.domain.repository.AuthRepository
+import com.chatappfrontend.domain.repository.UserRepository
 import javax.inject.Inject
 
 class GetUsersUseCase @Inject constructor(
-    private val authRepository: AuthRepository
+    private val userRepository: UserRepository
 ) {
 
-    suspend operator fun invoke(): ActionResult<List<User>> {
-        return authRepository.getUsers()
+    suspend operator fun invoke(): ResultWrapper<List<User>> {
+        return userRepository.getUsers()
     }
 }

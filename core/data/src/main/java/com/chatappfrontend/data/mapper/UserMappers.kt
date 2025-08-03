@@ -1,16 +1,16 @@
 package com.chatappfrontend.data.mapper
 
 import com.chatappfrontend.domain.model.User
-import com.example.network.model.AuthenticatedUserDto
-import com.example.network.model.UserDto
+import com.example.network.model.AuthenticationResponseDTO
+import com.example.network.model.UserDTO
 
-fun AuthenticatedUserDto.toUser() = User(
+fun AuthenticationResponseDTO.toUser() = User(
     id = id,
     username = username,
     email = email
 )
 
-fun UserDto.toUser() = User(
+fun UserDTO.toUser() = User(
     id = id,
     username = username,
     email = email

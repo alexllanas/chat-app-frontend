@@ -24,8 +24,8 @@ android {
     buildTypes {
         debug {
             buildConfigField("Boolean", "USE_REMOTE_SERVER", "false")
-            buildConfigField("String", "REMOTE_SERVER_URL", "\"http://52.15.221.75:3000/api/v1/\"")
-            buildConfigField("String", "LOCAL_SERVER_URL", "\"http://10.0.2.2:3000/api/v1/\"")
+            buildConfigField("String", "REMOTE_SERVER_URL", "\"http://3.88.177.206:3000/api/v1/\"")
+            buildConfigField("String", "LOCAL_SERVER_URL", "\"https://2f3f047ba69c.ngrok-free.app/api/v1/\"")
         }
         release {
             isMinifyEnabled = false

@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,22 +39,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.chatappfrontend.common.UiEvent
 import com.example.messages.R
-import com.example.messages.viewmodel.ConversationListViewModel
+import com.example.messages.viewmodel.ChatListViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConversationListScreen(
+fun ChatListScreen(
     modifier: Modifier = Modifier,
-    viewModel: ConversationListViewModel = hiltViewModel(),
+    viewModel: ChatListViewModel = hiltViewModel(),
     onNewMessageClick: () -> Unit,
-    onConversationClick: (String) -> Unit,
+    onChatClick: (String, String) -> Unit,
     onLogout: (String) -> Unit,
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
 
-
     LaunchedEffect(Unit) {
-        viewModel.getUsers()
+        viewModel.getChats()
 
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -66,6 +68,11 @@ fun ConversationListScreen(
     }
 
     Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(text = uiState.username) }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNewMessageClick
@@ -89,17 +96,17 @@ fun ConversationListScreen(
                     Text("Logout")
                 }
             }
-            items(uiState.users) { user ->
+            items(uiState.chats) { chat ->
 
-                ConversationItem(
+                ChatItem(
                     modifier = Modifier
                         .clickable {
-                            onConversationClick(user.username)
+                            onChatClick(chat.id, chat.userId)
                         },
                     profileImage = painterResource(R.drawable.round_account_circle_24),
-                    contactName = user.username,
-                    lastMessage = "Last message from ${user.username} Last message from person",
-                    date = "Today"
+                    contactName = chat.username,
+                    lastMessage = chat.lastMessage,
+                    date = chat.lastMessageTimeStamp
                 )
             }
         }
@@ -108,7 +115,7 @@ fun ConversationListScreen(
 }
 
 @Composable
-fun ConversationItem(
+fun ChatItem(
     profileImage: Painter,
     modifier: Modifier = Modifier,
     contactName: String,

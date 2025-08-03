@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.common_android"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24

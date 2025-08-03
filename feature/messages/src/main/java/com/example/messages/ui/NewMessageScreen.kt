@@ -37,7 +37,7 @@ import com.example.messages.viewmodel.NewMessageViewModel
 fun NewMessageScreen(
     modifier: Modifier = Modifier,
     viewModel: NewMessageViewModel = hiltViewModel(),
-    navigateToConversation: (String) -> Unit,
+    navigateToChat: (String?, String) -> Unit,
     onBackPressed: () -> Unit
 ) {
      LaunchedEffect(Unit) {
@@ -93,7 +93,7 @@ fun NewMessageScreen(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .clickable {
-                                navigateToConversation(user.username)
+                                navigateToChat(null, user.id)
                             },
                         contentAlignment = Alignment.CenterStart
                     ) {

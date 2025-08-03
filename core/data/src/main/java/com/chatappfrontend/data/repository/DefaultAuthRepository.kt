@@ -1,11 +1,11 @@
 package com.chatappfrontend.data.repository
 
-import com.chatappfrontend.common.ActionResult
+import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.domain.model.User
 import com.chatappfrontend.data.mapper.toUser
 import com.chatappfrontend.domain.repository.AuthRepository
 import com.example.network.CAFNetworkDataSource
-import com.example.network.utils.ResponseErrorParser
+import com.example.network.utils.safeApiCall
 import com.example.security.DataStoreManager
 import javax.inject.Inject
 
@@ -14,86 +14,61 @@ class DefaultAuthRepository @Inject constructor(
     private val dataStoreManager: DataStoreManager
 ) : AuthRepository {
 
-    override suspend fun registerUser(username: String, email: String, password: String): ActionResult<User> {
-        val result = try {
-            val response = network.registerUser(
-                username = username,
-                email = email,
-                password = password
-            )
-            if (response.isSuccessful) {
-                val userDto = response.body()
-                if (userDto != null) {
-                    dataStoreManager.saveUserSession(
-                        accessToken = userDto.accessToken,
-                        userId = userDto.id,
-                        username = userDto.username,
-                        email = userDto.email
-                    )
-                    val user = userDto.toUser()
-                    ActionResult.Success(user)
-                } else {
-                    ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
-                }
-            } else {
-                ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
+    override suspend fun registerUser(
+        username: String,
+        email: String,
+        password: String
+    ): ResultWrapper<User> {
+
+        return safeApiCall(
+            apiCall = {
+                network.registerUser(
+                    username = username,
+                    email = email,
+                    password = password
+                )
+            },
+            onSuccess = { authResponse ->
+                dataStoreManager.saveUserSession(
+                    userId = authResponse.id,
+                    username = authResponse.username,
+                    email = authResponse.email,
+                    accessToken = authResponse.accessToken,
+                    lastLogin = authResponse.lastLogin ?: "",
+                    createdAt = authResponse.createdAt
+                )
+                authResponse.toUser()
             }
-        } catch (e: Exception) {
-            ActionResult.Exception(e)
-        }
-        return result
+        )
     }
 
-    override suspend fun login(email: String, password: String): ActionResult<User> {
-        val result = try {
-            val response = network.login(
-                email = email,
-                password = password
-            )
-            if (response.isSuccessful) {
-                val userDto = response.body()
-                if (userDto != null) {
-                    dataStoreManager.saveUserSession(
-                        accessToken = userDto.accessToken,
-                        username = userDto.username,
-                        userId = userDto.id,
-                        email = userDto.email
-                    )
-                    val user = userDto.toUser()
-                    ActionResult.Success(user)
-                } else {
-                    ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
-                }
-            } else {
-                ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
+
+    override suspend fun login(
+        email: String,
+        password: String
+    ): ResultWrapper<User> {
+
+        return safeApiCall(
+            apiCall = {
+                network.login(
+                    email = email,
+                    password = password
+                )
+            },
+            onSuccess = { authResponse ->
+                dataStoreManager.saveUserSession(
+                    userId = authResponse.id,
+                    username = authResponse.username,
+                    email = authResponse.email,
+                    accessToken = authResponse.accessToken,
+                    lastLogin = authResponse.lastLogin ?: ""
+                )
+                authResponse.toUser()
             }
-        } catch (e: Exception) {
-            ActionResult.Exception(e)
-        }
-        return result
+        )
     }
 
     override suspend fun logout() {
         dataStoreManager.clearUserSession()
-    }
-
-    override suspend fun getUsers(): ActionResult<List<User>> {
-        val result = try {
-            val response = network.getUsers()
-            if (response.isSuccessful) {
-                val userDtos = response.body()
-                if (userDtos != null) {
-                    val users = userDtos.users.map { it.toUser() }
-                    ActionResult.Success(users)
-                } else {
-                    ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
-                }
-            } else {
-                ActionResult.Error(response.code(), ResponseErrorParser.parseMessage(response.errorBody()?.string()))
-            }
-        } catch (e: Exception) {
-            ActionResult.Exception(e)
-        }
-        return result
     }
 }

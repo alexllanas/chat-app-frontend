@@ -4,6 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UsersDto(
-    val users: List<UserDto>
+data class MessageListDTO(
+
+    @SerialName("messages")
+    val messages: List<MessageDTO>
 )

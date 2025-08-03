@@ -1,6 +1,6 @@
 package com.chatappfrontend.domain.repository
 
-import com.chatappfrontend.common.ActionResult
+import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.domain.model.User
 
 interface AuthRepository {
@@ -8,14 +8,12 @@ interface AuthRepository {
         username: String,
         email: String,
         password: String
-    ): ActionResult<User>
+    ): ResultWrapper<User>
 
     suspend fun login(
         email: String,
         password: String
-    ): ActionResult<User>
+    ): ResultWrapper<User>
 
     suspend fun logout()
-
-    suspend fun getUsers(): ActionResult<List<User>>
 }
