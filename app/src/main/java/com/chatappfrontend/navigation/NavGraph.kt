@@ -3,6 +3,7 @@ package com.chatappfrontend.navigation
 import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -18,6 +19,7 @@ import com.example.messages.ui.ChatListScreen
 import com.example.messages.ui.ChatScreen
 import com.example.messages.ui.NewMessageScreen
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
@@ -72,9 +74,13 @@ fun AppNavHost(
                         popUpTo(Screen.ChatList.route) { inclusive = false }
                     }
                 },
-                onChatClick = { chatId, userId ->
+                onChatClick = { chatId, recipientId, username ->
                     navController.navigate(
-                        Screen.Chat.createRoute(chatId = chatId, userId = userId)
+                        Screen.Chat.createRoute(
+                            chatId = chatId,
+                            recipientId = recipientId,
+                            username = username
+                        )
                     ) {
                         popUpTo(Screen.ChatList.route) { inclusive = false }
                     }
@@ -90,11 +96,12 @@ fun AppNavHost(
         composable(Screen.NewMessage.route) {
             Log.d("NewMessageScreen", "Navigating to NewMessageScreen")
             NewMessageScreen(
-                navigateToChat = { chatId, userId ->
+                navigateToChat = { chatId, userId, username ->
                     navController.navigate(
                         Screen.Chat.createRoute(
                             chatId = chatId,
-                            userId = userId
+                            recipientId = userId,
+                            username = username
                         )
                     ) {
                         popUpTo(Screen.ChatList.route) { inclusive = false }
@@ -111,18 +118,29 @@ fun AppNavHost(
             arguments = listOf(
                 navArgument("chatId") {
                     type = NavType.StringType
+                    nullable = true
                 },
                 navArgument("userId") {
                     type = NavType.StringType
+                    nullable = true
+                },
+                navArgument("username") {
+                    type = NavType.StringType
+                    nullable = true
                 }
             )
         ) { backStackEntry ->
-            Log.d("ChatScreen", "Navigating to ChatScreen with arguments: ${backStackEntry.arguments}")
+            Log.d(
+                "ChatScreen",
+                "Navigating to ChatScreen with arguments: ${backStackEntry.arguments}"
+            )
             val chatId = backStackEntry.arguments?.getString("chatId")
             val userId = backStackEntry.arguments?.getString("userId")
+            val username = backStackEntry.arguments?.getString("username")
             ChatScreen(
                 chatId = chatId,
                 userId = userId,
+                username = username,
                 onBackPressed = {
                     navController.navigate(Screen.ChatList.route) {
                         popUpTo(Screen.ChatList.route) { inclusive = false }

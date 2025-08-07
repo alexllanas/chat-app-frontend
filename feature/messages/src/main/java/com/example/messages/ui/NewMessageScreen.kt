@@ -32,12 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.messages.viewmodel.NewMessageViewModel
 
+// load users with chatid?
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewMessageScreen(
     modifier: Modifier = Modifier,
     viewModel: NewMessageViewModel = hiltViewModel(),
-    navigateToChat: (String?, String) -> Unit,
+    navigateToChat: (String?, String?, String?) -> Unit,
     onBackPressed: () -> Unit
 ) {
      LaunchedEffect(Unit) {
@@ -93,7 +94,7 @@ fun NewMessageScreen(
                             .fillMaxWidth()
                             .padding(8.dp)
                             .clickable {
-                                navigateToChat(null, user.id)
+                                navigateToChat(user.chatId, user.id, user.username)
                             },
                         contentAlignment = Alignment.CenterStart
                     ) {

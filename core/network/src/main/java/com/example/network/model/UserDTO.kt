@@ -12,5 +12,8 @@ data class UserDTO(
     val username: String,
 
     @SerialName("email")
-    val email: String
+    val email: String,
+
+    @SerialName("chatId")
+    val chatId: String?
 )

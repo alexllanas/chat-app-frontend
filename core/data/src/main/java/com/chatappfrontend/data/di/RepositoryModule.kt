@@ -4,7 +4,8 @@ import com.chatappfrontend.data.repository.DefaultAuthRepository
 import com.chatappfrontend.data.repository.DefaultMessageRepository
 import com.chatappfrontend.data.repository.DefaultUserRepository
 import com.chatappfrontend.data.websocket.WebSocketManager
-import com.example.network.CAFNetworkDataSource
+import com.example.database.LocalDataSource
+import com.example.network.RemoteDataSource
 import com.example.security.DataStoreManager
 import dagger.Module
 import dagger.Provides
@@ -19,7 +20,7 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideDefaultAuthRepository(
-        network: CAFNetworkDataSource,
+        network: RemoteDataSource,
         dataStoreManager: DataStoreManager
     ): DefaultAuthRepository {
         return DefaultAuthRepository(
@@ -31,10 +32,12 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideDefaultUserRepository(
-        network: CAFNetworkDataSource,
+        network: RemoteDataSource,
+        dataStoreManager: DataStoreManager
     ): DefaultUserRepository {
         return DefaultUserRepository(
-            network = network
+            network = network,
+            dataStoreManager = dataStoreManager
         )
     }
 
@@ -43,12 +46,14 @@ object RepositoryModule {
     fun provideMessageRepository(
         webSocketManager: WebSocketManager,
         dataStoreManager: DataStoreManager,
-        network: CAFNetworkDataSource
+        network: RemoteDataSource,
+        database: LocalDataSource
     ): DefaultMessageRepository {
         return DefaultMessageRepository(
             webSocketManager = webSocketManager,
             dataStoreManager = dataStoreManager,
-            network = network
+            network = network,
+            database = database
         )
     }
 }

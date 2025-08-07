@@ -13,7 +13,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,10 +32,6 @@ class ChatViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val userId = dataStoreManager.getUserId() ?: ""
-            val username = dataStoreManager.getUsername() ?: ""
-            _uiState.value = _uiState.value.copy(
-                username = username
-            )
 
             webSocketManager.connect(userId = userId)
 
@@ -46,30 +44,46 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun sendMessage(chatId: String, userId: String) {
-        if (uiState.value.message.isBlank()) {
+    fun sendMessage(chatId: String, recipientId: String) {
+        if (uiState.value.textFieldInput.isBlank()) {
             Log.d("ChatViewModel", "Message is blank, not sending")
             return
         }
         viewModelScope.launch {
             Log.d(
                 "ChatViewModel",
-                "Sending message: ${uiState.value.message} to chatId: $chatId, userId: $userId"
+                "Sending message: ${uiState.value.textFieldInput} to chatId: $chatId, userId: $recipientId"
             )
-            messageRepository.sendMessage(userId, uiState.value.message)
-            dataStoreManager.getUserId()?.let {
-                _uiState.value = _uiState.value.copy(
-                    messages = _uiState.value.messages + Message(
-                        id = chatId,
-                        content = uiState.value.message,
-                        senderId = it,
-                        recipientId = userId,
-                        createdAt = "System.currentTimeMillis()",
-                        isRead = false,
-                    ),
-                )
-            } ?: Log.e("ChatViewModel", "User ID not found in DataStore")
-            _uiState.value = _uiState.value.copy(message = "")
+            val userId = dataStoreManager.getUserId() ?: ""
+            val tempMessageId = UUID.randomUUID().toString()
+            val newMessage = Message(
+                id = tempMessageId,
+                chatId = chatId,
+                content = uiState.value.textFieldInput,
+                senderId = userId,
+                recipientId = recipientId
+            )
+            val result = messageRepository.sendMessage(recipientId, uiState.value.textFieldInput)
+            when (result) {
+                is ResultWrapper.Success<Message.Status> -> {
+                    if (result.data == Message.Status.FAILED) {
+                        _uiState.value.messages.map {
+                            if (tempMessageId == it.id) {
+                                newMessage.copy(status = Message.Status.FAILED)
+                            } else {
+                                it
+                            }
+                        }
+                    }
+                }
+                is ResultWrapper.Error -> {}
+                is ResultWrapper.Exception -> {}
+                ResultWrapper.Ignored -> {}
+            }
+            _uiState.value = _uiState.value.copy(
+                messages = listOf(newMessage) + _uiState.value.messages,
+                textFieldInput = ""
+            )
         }
     }
 
@@ -78,61 +92,57 @@ class ChatViewModel @Inject constructor(
         if (chatId != null) {
             Log.d("ChatViewModel", "ChatId is not null, fetching messages for chatId: $chatId")
             getMessages(chatId = chatId)
-        } else if (userId != null) {
-            Log.d(
-                "ChatViewModel",
-                "UserId is not null, checking if chat exists for userId: $userId"
-            )
-            checkIfChatExists(userId = userId)
         } else {
             Log.d("ChatViewModel", "Both chatId and userId are null, cannot fetch messages")
             // Show error or handle the case where both chatId and userId are null
         }
     }
 
-    private fun checkIfChatExists(userId: String) {
+    private fun getMessages(chatId: String?) {
         viewModelScope.launch {
-            val result = messageRepository.checkIfChatExists(userId)
-            if (result is ResultWrapper.Success) {
-                Log.d("ChatViewModel", "Chat exists with ID: ${result.data}")
-                getMessages(chatId = result.data)
-            } else {
-                Log.d("ChatViewModel", "Chat does not exist for userId: $userId")
-                // Handle error or exception
-                // if 404 does not exist, empty list
-            }
-        }
-    }
-
-    private fun getMessages(chatId: String) {
-        viewModelScope.launch {
-            val result = messageRepository.getMessages(chatId = chatId)
-            when (result) {
-                is ResultWrapper.Success -> {
-                    Log.d("ChatViewModel", "Messages fetched successfully for chatId: $chatId")
-                    _uiState.value = _uiState.value.copy(
-                        messages = result.data,
+            val userId = dataStoreManager.getUserId()
+            val result = messageRepository.getChatSession(chatId = chatId, userId)
+//            val mess = messageRepository.getMessagesResource(chatId = chatId?: "", userId?: "")
+            val messages = messageRepository.getMessages(chatId = chatId?: "")
+            messages.collect { list ->
+                list.forEach {
+                    Log.d("chat", "getMessages: $it")
+                }
+                _uiState.update {
+                    it.copy(
+                        messages = list
                     )
                 }
-
-                is ResultWrapper.Error -> {
-
-                    // Handle error
-                }
-
-                is ResultWrapper.Exception -> {
-                    // Handle exception
-                }
-
-                ResultWrapper.Ignored -> {
-                    // Handle ignored case
-                }
             }
+//            when (result) {
+//                is ResultWrapper.Success -> {
+//                    Log.d("ChatViewModel", "Messages fetched successfully for chatId: $chatId")
+//                    _uiState.value = _uiState.value.copy(
+//                        chatId = result.data.chatId,
+//                        recipientId = result.data.userId,
+//                        username = result.data.username,
+//                        messages = result.data.messages,
+//                    )
+//                }
+//
+//                is ResultWrapper.Error -> {
+//
+//                    // Handle error
+//                }
+//
+//                is ResultWrapper.Exception -> {
+//                    // Handle exception
+//                }
+//
+//                ResultWrapper.Ignored -> {
+//                    // Handle ignored case
+//                }
+//            }
         }
     }
 
     fun setMessage(message: String) {
-        _uiState.value = _uiState.value.copy(message = message)
+        _uiState.value = _uiState.value.copy(textFieldInput = message)
     }
 
     fun disconnect() {

@@ -1,8 +1,8 @@
 package com.example.messages.state
 
-import com.chatappfrontend.domain.model.Chat
+import com.chatappfrontend.domain.model.ChatInfo
 
 data class ChatListUiState(
     val username: String = "",
-    val chats: List<Chat> = emptyList()
+    val chatInfos: List<ChatInfo> = emptyList()
 )

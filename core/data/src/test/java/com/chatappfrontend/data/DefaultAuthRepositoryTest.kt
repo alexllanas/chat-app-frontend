@@ -2,7 +2,7 @@ package com.chatappfrontend.data
 
 import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.data.repository.DefaultAuthRepository
-import com.example.network.CAFNetworkDataSource
+import com.example.network.RemoteDataSource
 import com.example.network.model.AuthenticationResponseDTO
 import com.example.security.DataStoreManager
 import io.mockk.Runs
@@ -30,7 +30,7 @@ class DefaultAuthRepositoryTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private lateinit var network: CAFNetworkDataSource
+    private lateinit var network: RemoteDataSource
     private lateinit var dataStoreManager: DataStoreManager
 
     private lateinit var repository: DefaultAuthRepository

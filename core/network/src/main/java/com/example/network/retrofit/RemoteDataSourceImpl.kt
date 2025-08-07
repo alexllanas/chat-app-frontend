@@ -1,15 +1,12 @@
 package com.example.network.retrofit
 
 import com.example.network.BuildConfig
-import com.example.network.CAFNetworkDataSource
+import com.example.network.RemoteDataSource
 import com.example.network.model.AuthenticationResponseDTO
-import com.example.network.model.ChatDTO
-import com.example.network.model.ChatListDTO
+import com.example.network.model.ChatListInfoDTO
+import com.example.network.model.ChatSessionDTO
 import com.example.network.model.LoginRequestDTO
-import com.example.network.model.MessageDTO
-import com.example.network.model.MessageListDTO
 import com.example.network.model.RegistrationRequestDTO
-import com.example.network.model.UserDTO
 import com.example.network.model.UserListDTO
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -21,10 +18,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RetrofitCAFNetwork @Inject constructor(
+class RemoteDataSourceImpl @Inject constructor(
     networkJson: Json,
     okHttpClient: OkHttpClient,
-) : CAFNetworkDataSource {
+) : RemoteDataSource {
 
     private val baseUrl = if (BuildConfig.USE_REMOTE_SERVER) {
         BuildConfig.REMOTE_SERVER_URL
@@ -40,7 +37,7 @@ class RetrofitCAFNetwork @Inject constructor(
                 networkJson.asConverterFactory("application/json".toMediaType())
             )
             .build()
-            .create(RetrofitCAFNetworkApi::class.java)
+            .create(RetrofitApi::class.java)
 
     override suspend fun registerUser(username: String, email: String, password: String): Response<AuthenticationResponseDTO> {
         return networkApi.registerUser(
@@ -61,19 +58,15 @@ class RetrofitCAFNetwork @Inject constructor(
         )
     }
 
-    override suspend fun getUsers(): Response<UserListDTO> {
-        return networkApi.getUsers()
+    override suspend fun getUsers(id: String): Response<UserListDTO> {
+        return networkApi.getUsers(id)
     }
 
-    override suspend fun getChats(userId: String): Response<ChatListDTO> {
+    override suspend fun getChats(userId: String): Response<ChatListInfoDTO> {
         return networkApi.getChats(userId = userId)
     }
 
-    override suspend fun getMessages(chatId: String): Response<MessageListDTO> {
-        return networkApi.getMessages(chatId = chatId)
-    }
-
-    override suspend fun checkIfChatExists(userId: String, recipientId: String): Response<String> {
-        return networkApi.checkIfChatExists(userId = userId, recipientId = recipientId)
+    override suspend fun getMessages(chatId: String?, userId: String?): Response<ChatSessionDTO> {
+        return networkApi.getMessages(chatId = chatId, userId)
     }
 }

@@ -81,17 +81,16 @@ class WebSocketManager {
         Log.d("WebSocketManager", "WebSocket disconnected")
     }
 
-    fun sendMessage(messagePayloadDTO: MessagePayloadDTO): ResultWrapper<Unit> {
+    fun sendMessage(messagePayloadDTO: MessagePayloadDTO): ResultWrapper<Message.Status> {
         Log.d("WebSocketManager", "Sending message: $messagePayloadDTO")
         val payload = Json.encodeToString(messagePayloadDTO)
         val wasSent = webSocket.send(text = payload)
         if (wasSent) {
             Log.d("WebSocketManager", "Message sent successfully")
-            return ResultWrapper.Success(Unit)
+            return ResultWrapper.Success(Message.Status.SENT)
         } else {
             Log.e("WebSocketManager", "Failed to send message")
-            return ResultWrapper.Error(400,"Failed to send message")
+            return ResultWrapper.Success(Message.Status.FAILED)
         }
     }
-
 }

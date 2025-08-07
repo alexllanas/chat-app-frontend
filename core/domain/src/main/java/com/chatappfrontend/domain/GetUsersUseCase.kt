@@ -10,6 +10,7 @@ class GetUsersUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(): ResultWrapper<List<User>> {
+
         return userRepository.getUsers()
     }
 }

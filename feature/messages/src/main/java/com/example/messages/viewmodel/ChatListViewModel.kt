@@ -52,7 +52,7 @@ class ChatListViewModel @Inject constructor(
             when (val result = messageRepository.getChats()) {
                 is ResultWrapper.Success -> {
                     _uiState.value = _uiState.value.copy(
-                        chats = result.data,
+                        chatInfos = result.data,
                     )
                 }
                 is ResultWrapper.Error -> {

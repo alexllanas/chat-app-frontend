@@ -4,9 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ChatDTO(
-    @SerialName("id")
-    val id: String,
+data class ChatSessionDTO(
+    @SerialName("chatId")
+    val chatId: String,
 
     @SerialName("userId")
     val userId: String,
@@ -14,9 +14,6 @@ data class ChatDTO(
     @SerialName("username")
     val username: String,
 
-    @SerialName("lastMessage")
-    val lastMessage: String,
-
-    @SerialName("lastMessageTimeStamp")
-    val lastMessageTimeStamp: String,
+    @SerialName("messages")
+    val messages: List<MessageDTO>
 )

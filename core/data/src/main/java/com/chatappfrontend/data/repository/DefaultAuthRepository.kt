@@ -4,13 +4,13 @@ import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.domain.model.User
 import com.chatappfrontend.data.mapper.toUser
 import com.chatappfrontend.domain.repository.AuthRepository
-import com.example.network.CAFNetworkDataSource
+import com.example.network.RemoteDataSource
 import com.example.network.utils.safeApiCall
 import com.example.security.DataStoreManager
 import javax.inject.Inject
 
 class DefaultAuthRepository @Inject constructor(
-    private val network: CAFNetworkDataSource,
+    private val network: RemoteDataSource,
     private val dataStoreManager: DataStoreManager
 ) : AuthRepository {
 

@@ -13,5 +13,6 @@ fun AuthenticationResponseDTO.toUser() = User(
 fun UserDTO.toUser() = User(
     id = id,
     username = username,
-    email = email
+    email = email,
+    chatId = chatId
 )

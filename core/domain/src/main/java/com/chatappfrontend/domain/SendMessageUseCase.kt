@@ -15,7 +15,7 @@ class SendMessageUseCase @Inject constructor(
     suspend operator fun invoke(
         recipientId: String,
         content: String
-    ) : ResultWrapper<Unit> {
+    ) : ResultWrapper<Message.Status> {
         return messageRepository.sendMessage(
             recipientId = recipientId,
             content = content

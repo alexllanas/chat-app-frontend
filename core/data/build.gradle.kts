@@ -21,7 +21,7 @@ android {
         debug {
             buildConfigField("Boolean", "USE_REMOTE_WEB_SOCKET_URL", "false")
             buildConfigField("String", "REMOTE_WEB_SOCKET_URL", "\"ws://3.88.177.206:3000/api/v1/\"")
-            buildConfigField("String", "LOCAL_WEB_SOCKET_URL", "\"wss://2f3f047ba69c.ngrok-free.app/api/v1\"")
+            buildConfigField("String", "LOCAL_WEB_SOCKET_URL", "\"wss://3d7a61ea3571.ngrok-free.app/api/v1\"")
         }
         release {
             isMinifyEnabled = false
@@ -77,4 +77,5 @@ dependencies {
     implementation(project(":core:security"))
     implementation(project(":core:network"))
     implementation(project(":core:domain"))
+    implementation(project(":core:database"))
 }

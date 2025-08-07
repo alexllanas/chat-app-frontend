@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-data class Chat(
+data class ChatInfo(
     val id: String,
     val userId: String,
     val username: String,
