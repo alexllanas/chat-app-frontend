@@ -42,9 +42,6 @@ import com.example.messages.R
 import com.example.messages.viewmodel.ChatListViewModel
 
 
-// should i use the user id for the selected chat to check if chat exists and then return that chat id? and
-// if it doesn't exist, create a new chat with the user id and return that chat id? or should i include the chat id
-// with the user when i first load this screen?
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatListScreen(
@@ -100,8 +97,7 @@ fun ChatListScreen(
                     Text("Logout")
                 }
             }
-            items(uiState.chatInfos) { chat ->
-
+            items(uiState.chats) { chat ->
                 ChatItem(
                     modifier = Modifier
                         .clickable {

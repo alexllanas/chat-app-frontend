@@ -4,6 +4,7 @@ import com.example.network.model.AuthenticationResponseDTO
 import com.example.network.model.ChatListInfoDTO
 import com.example.network.model.ChatSessionDTO
 import com.example.network.model.LoginRequestDTO
+import com.example.network.model.MessageDTO
 import com.example.network.model.RegistrationRequestDTO
 import com.example.network.model.UserListDTO
 import retrofit2.Response
@@ -27,9 +28,8 @@ internal interface RetrofitApi {
     @GET("users/{userId}/chats")
     suspend fun getChats(@Path("userId") userId: String): Response<ChatListInfoDTO>
 
-    @GET("chats/{chatId}/{userId}")
+    @GET("chats/{chatId}")
     suspend fun getMessages
                 (@Path("chatId") chatId: String?,
-                 @Path("userId") userId: String?
-    ): Response<ChatSessionDTO>
+    ): Response<List<MessageDTO>>
 }

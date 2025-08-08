@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import com.chatappfrontend.domain.repository.Resource
+import com.chatappfrontend.common.Resource
 import kotlinx.coroutines.flow.*
 
 /**

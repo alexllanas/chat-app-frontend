@@ -56,4 +56,6 @@ dependencies {
     testImplementation(libs.hilt.android.testing) // For local unit tests
     kaptTest(libs.hilt.compiler)
 
+    // Project
+    implementation(project(":core:common"))
 }

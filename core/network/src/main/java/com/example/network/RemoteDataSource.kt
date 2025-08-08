@@ -1,9 +1,12 @@
 package com.example.network
 
+import com.chatappfrontend.common.Resource
 import com.example.network.model.AuthenticationResponseDTO
 import com.example.network.model.ChatListInfoDTO
-import com.example.network.model.ChatSessionDTO
+import com.example.network.model.MessageDTO
+import com.example.network.model.UserDTO
 import com.example.network.model.UserListDTO
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
 interface RemoteDataSource {
@@ -18,9 +21,9 @@ interface RemoteDataSource {
         password: String
     ): Response<AuthenticationResponseDTO>
 
-    suspend fun getUsers(id: String): Response<UserListDTO>
+    suspend fun getUsers(currentUserId: String): Response<UserListDTO>
 
-    suspend fun getChats(userId: String): Response<ChatListInfoDTO>
+    suspend fun getChats(currentUserId: String): Response<ChatListInfoDTO>
 
-    suspend fun getMessages(chatId: String?, userId: String?): Response<ChatSessionDTO>
+    suspend fun getMessages(chatId: String?): Response<List<MessageDTO>>
 }

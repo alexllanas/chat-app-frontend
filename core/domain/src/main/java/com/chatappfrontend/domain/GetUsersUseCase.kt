@@ -9,8 +9,8 @@ class GetUsersUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
 
-    suspend operator fun invoke(): ResultWrapper<List<User>> {
-
-        return userRepository.getUsers()
-    }
+//    suspend operator fun invoke(): ResultWrapper<List<User>> {
+//
+//        return userRepository.getUsers()
+//    }
 }

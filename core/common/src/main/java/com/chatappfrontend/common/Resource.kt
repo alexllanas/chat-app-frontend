@@ -1,4 +1,4 @@
-package com.chatappfrontend.domain.repository
+package com.chatappfrontend.common
 
 sealed class Resource<T>(
     val data: T? = null,

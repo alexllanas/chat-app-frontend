@@ -4,9 +4,10 @@ import com.example.network.BuildConfig
 import com.example.network.RemoteDataSource
 import com.example.network.model.AuthenticationResponseDTO
 import com.example.network.model.ChatListInfoDTO
-import com.example.network.model.ChatSessionDTO
 import com.example.network.model.LoginRequestDTO
+import com.example.network.model.MessageDTO
 import com.example.network.model.RegistrationRequestDTO
+import com.example.network.model.UserDTO
 import com.example.network.model.UserListDTO
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -62,11 +63,11 @@ class RemoteDataSourceImpl @Inject constructor(
         return networkApi.getUsers(id)
     }
 
-    override suspend fun getChats(userId: String): Response<ChatListInfoDTO> {
-        return networkApi.getChats(userId = userId)
+    override suspend fun getChats(currentUserId: String): Response<ChatListInfoDTO> {
+        return networkApi.getChats(userId = currentUserId)
     }
 
-    override suspend fun getMessages(chatId: String?, userId: String?): Response<ChatSessionDTO> {
-        return networkApi.getMessages(chatId = chatId, userId)
+    override suspend fun getMessages(chatId: String?): Response<List<MessageDTO>> {
+        return networkApi.getMessages(chatId = chatId)
     }
 }

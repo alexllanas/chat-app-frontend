@@ -1,22 +1,27 @@
 package com.example.messages.viewmodel
 
 import androidx.lifecycle.viewModelScope
+import com.chatappfrontend.common.Resource
 import com.chatappfrontend.common.ResultWrapper
+import com.chatappfrontend.data.repository.DefaultUserRepository
 import com.chatappfrontend.domain.GetUsersUseCase
 import com.chatappfrontend.domain.model.User
+import com.chatappfrontend.domain.repository.UserRepository
 import com.chatappfrontend.ui.BaseViewModel
 import com.example.messages.state.NewMessageUiState
+import com.example.security.DataStoreManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NewMessageViewModel @Inject constructor(
-    private val getUsersUseCase: GetUsersUseCase,
-
+    private val dataStoreManager: DataStoreManager,
+    private val userRepository: UserRepository
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(value = NewMessageUiState())
@@ -24,22 +29,25 @@ class NewMessageViewModel @Inject constructor(
 
     fun getUsers() {
         viewModelScope.launch {
-            try {
-                val result = getUsersUseCase.invoke()
-                when (result) {
-                    is ResultWrapper.Success -> {
-                        _uiState.value = _uiState.value.copy(users = result.data)
+            val userId = dataStoreManager.getUserId() ?: ""
+            val result = userRepository.getUsers(currentUserId = userId)
+
+            result.collect { resource ->
+                when (resource) {
+                    is Resource.Error<*> -> {}
+                    is Resource.Loading<*> -> {
+                        _uiState.update { it.copy(isLoading = true) }
                     }
-                    is ResultWrapper.Error -> {
-//                        emitUiEvent(event = UiEvent.ShowError(message = result.message ?: "An error occurred"))
+
+                    is Resource.Success<*> -> {
+                        _uiState.update {
+                            it.copy(
+                                users = resource.data ?: listOf(),
+                                isLoading = false
+                            )
+                        }
                     }
-                    is ResultWrapper.Exception -> {
-//                        emitUiEvent(event = UiEvent.ShowError(message = result.exception.message ?: "An error occurred"))
-                    }
-                    ResultWrapper.Ignored -> {}
                 }
-            } catch (e: Exception) {
-//                emitUiEvent(event = UiEvent.ShowError(message = e.message ?: "An error occurred"))
             }
         }
     }

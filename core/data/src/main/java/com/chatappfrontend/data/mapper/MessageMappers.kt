@@ -1,6 +1,6 @@
 package com.chatappfrontend.data.mapper
 
-import com.chatappfrontend.common.convertToMessageTime
+import com.chatappfrontend.common.formatMessageTime
 import com.chatappfrontend.domain.model.Message
 import com.example.database.model.MessageEntity
 import com.example.network.model.MessageDTO
@@ -11,7 +11,7 @@ fun MessageDTO.toMessage() = Message(
     senderId = senderId,
     recipientId = recipientId,
     content = content,
-    createdAt = convertToMessageTime(createdAt),
+    createdAt = createdAt,
     isRead = isRead
 )
 
@@ -21,7 +21,7 @@ fun MessageDTO.toMessageEntity() = MessageEntity(
     senderId = senderId,
     recipientId = recipientId,
     content = content,
-    createdAt = convertToMessageTime(createdAt),
+    createdAt = formatMessageTime(createdAt),
     isRead = isRead
 )
 

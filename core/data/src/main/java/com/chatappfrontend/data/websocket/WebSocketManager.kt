@@ -6,6 +6,7 @@ import com.chatappfrontend.data.BuildConfig
 import com.chatappfrontend.data.MessagePayloadDTO
 import com.chatappfrontend.data.mapper.toMessage
 import com.chatappfrontend.domain.model.Message
+import com.chatappfrontend.domain.repository.MessageRepository
 import com.example.network.model.MessageDTO
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -24,8 +25,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
+import javax.inject.Inject
 
-class WebSocketManager {
+class WebSocketManager @Inject constructor(
+) {
 
     private val client = OkHttpClient()
     private lateinit var webSocket: WebSocket
@@ -59,14 +62,18 @@ class WebSocketManager {
             override fun onMessage(webSocket: WebSocket, text: String) {
                 Log.d("WebSocketManager", "Received message: $text")
                 val messageDTO = Json.decodeFromString<MessageDTO>(text)
+
                 GlobalScope.launch {
                     _incomingMessages.emit(messageDTO.toMessage())
-
                 }
                 Log.d("WebSocketManager", "Message emitted: ${messageDTO.toMessage()}")
             }
 
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: okhttp3.Response?) {
+            override fun onFailure(
+                webSocket: WebSocket,
+                t: Throwable,
+                response: okhttp3.Response?
+            ) {
                 Log.d("WebSocketManager", "WebSocket failure: ${t.message}")
             }
 

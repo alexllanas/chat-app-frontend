@@ -33,11 +33,11 @@ object RepositoryModule {
     @Singleton
     fun provideDefaultUserRepository(
         network: RemoteDataSource,
-        dataStoreManager: DataStoreManager
+        database: LocalDataSource
     ): DefaultUserRepository {
         return DefaultUserRepository(
-            network = network,
-            dataStoreManager = dataStoreManager
+            db = database,
+            api = network
         )
     }
 
@@ -52,8 +52,8 @@ object RepositoryModule {
         return DefaultMessageRepository(
             webSocketManager = webSocketManager,
             dataStoreManager = dataStoreManager,
-            network = network,
-            database = database
+            api = network,
+            db = database
         )
     }
 }

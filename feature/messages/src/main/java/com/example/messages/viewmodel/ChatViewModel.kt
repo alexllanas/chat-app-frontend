@@ -2,7 +2,9 @@ package com.example.messages.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.chatappfrontend.common.Resource
 import com.chatappfrontend.common.ResultWrapper
+import com.chatappfrontend.common.formatMessageTime
 import com.chatappfrontend.data.websocket.WebSocketManager
 import com.chatappfrontend.domain.model.Message
 import com.chatappfrontend.domain.repository.MessageRepository
@@ -28,7 +30,6 @@ class ChatViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(value = ChatUiState())
     val uiState: StateFlow<ChatUiState> = _uiState.asStateFlow()
 
-
     init {
         viewModelScope.launch {
             val userId = dataStoreManager.getUserId() ?: ""
@@ -37,23 +38,21 @@ class ChatViewModel @Inject constructor(
 
             messageRepository.incomingMessages.collect { message ->
                 Log.d("ChatViewModel", "Incoming message: $message")
-                _uiState.value = _uiState.value.copy(
-                    messages = _uiState.value.messages + message
-                )
+                messageRepository.insertMessages(listOf(message))
+                if (userId != message.senderId) {
+                    _uiState.value = _uiState.value.copy(
+                        messages = _uiState.value.messages + message
+                    )
+                }
             }
         }
     }
 
     fun sendMessage(chatId: String, recipientId: String) {
         if (uiState.value.textFieldInput.isBlank()) {
-            Log.d("ChatViewModel", "Message is blank, not sending")
             return
         }
         viewModelScope.launch {
-            Log.d(
-                "ChatViewModel",
-                "Sending message: ${uiState.value.textFieldInput} to chatId: $chatId, userId: $recipientId"
-            )
             val userId = dataStoreManager.getUserId() ?: ""
             val tempMessageId = UUID.randomUUID().toString()
             val newMessage = Message(
@@ -63,6 +62,7 @@ class ChatViewModel @Inject constructor(
                 senderId = userId,
                 recipientId = recipientId
             )
+//            messageRepository.insertMessages(listOf(newMessage))
             val result = messageRepository.sendMessage(recipientId, uiState.value.textFieldInput)
             when (result) {
                 is ResultWrapper.Success<Message.Status> -> {
@@ -76,6 +76,7 @@ class ChatViewModel @Inject constructor(
                         }
                     }
                 }
+
                 is ResultWrapper.Error -> {}
                 is ResultWrapper.Exception -> {}
                 ResultWrapper.Ignored -> {}
@@ -87,57 +88,39 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun initializeData(chatId: String?, userId: String?) {
-        Log.d("ChatViewModel", "initializeData called with chatId: $chatId, userId: $userId")
+    fun initializeData(chatId: String?) {
         if (chatId != null) {
-            Log.d("ChatViewModel", "ChatId is not null, fetching messages for chatId: $chatId")
             getMessages(chatId = chatId)
-        } else {
-            Log.d("ChatViewModel", "Both chatId and userId are null, cannot fetch messages")
-            // Show error or handle the case where both chatId and userId are null
         }
     }
 
     private fun getMessages(chatId: String?) {
         viewModelScope.launch {
-            val userId = dataStoreManager.getUserId()
-            val result = messageRepository.getChatSession(chatId = chatId, userId)
-//            val mess = messageRepository.getMessagesResource(chatId = chatId?: "", userId?: "")
-            val messages = messageRepository.getMessages(chatId = chatId?: "")
-            messages.collect { list ->
-                list.forEach {
-                    Log.d("chat", "getMessages: $it")
-                }
-                _uiState.update {
-                    it.copy(
-                        messages = list
-                    )
+            val messages = messageRepository.getMessages(chatId = chatId ?: "")
+            messages.collect { resource ->
+                when (resource) {
+                    is Resource.Error<*> -> {
+
+                    }
+
+                    is Resource.Loading<*> -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+
+                    is Resource.Success<*> -> {
+                        _uiState.update {
+                            it.copy(
+                                messages = resource.data?.map { message ->
+                                    message.copy(
+                                        createdAt = formatMessageTime(message.createdAt)
+                                    )
+                                } ?: listOf(),
+                                isLoading = false
+                            )
+                        }
+                    }
                 }
             }
-//            when (result) {
-//                is ResultWrapper.Success -> {
-//                    Log.d("ChatViewModel", "Messages fetched successfully for chatId: $chatId")
-//                    _uiState.value = _uiState.value.copy(
-//                        chatId = result.data.chatId,
-//                        recipientId = result.data.userId,
-//                        username = result.data.username,
-//                        messages = result.data.messages,
-//                    )
-//                }
-//
-//                is ResultWrapper.Error -> {
-//
-//                    // Handle error
-//                }
-//
-//                is ResultWrapper.Exception -> {
-//                    // Handle exception
-//                }
-//
-//                ResultWrapper.Ignored -> {
-//                    // Handle ignored case
-//                }
-//            }
         }
     }
 
@@ -146,8 +129,10 @@ class ChatViewModel @Inject constructor(
     }
 
     fun disconnect() {
-        Log.d("ChatViewModel", "Disconnecting WebSocket")
         webSocketManager.disconnect()
     }
 
+    override fun onCleared() {
+        disconnect()
+    }
 }

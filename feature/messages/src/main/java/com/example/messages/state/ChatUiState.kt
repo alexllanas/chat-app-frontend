@@ -8,4 +8,5 @@ data class ChatUiState(
     val username: String = "",
     val messages: List<Message> = emptyList(),
     val textFieldInput: String = "",
+    val isLoading: Boolean = true
 )

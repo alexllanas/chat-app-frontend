@@ -1,5 +1,6 @@
 package com.chatappfrontend.domain.repository
 
+import com.chatappfrontend.common.Resource
 import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.domain.model.ChatInfo
 import com.chatappfrontend.domain.model.ChatSession
@@ -16,14 +17,10 @@ interface MessageRepository {
         content: String
     ): ResultWrapper<Message.Status>
 
-    suspend fun getChats(): ResultWrapper<List<ChatInfo>>
-
-    suspend fun getChatSession(chatId: String?, userId: String?): ResultWrapper<ChatSession>
+    suspend fun getChats(currentUserId: String): Flow<Resource<List<ChatInfo>>>
 
     suspend fun insertMessages(messages: List<Message>)
 
-    suspend fun getMessages(chatId: String): Flow<List<Message>>
-
-//    suspend fun getMessagesResource(chatId: String, userId: String): Flow<List<Message>>
+    suspend fun getMessages(chatId: String): Flow<Resource<List<Message>>>
 
 }

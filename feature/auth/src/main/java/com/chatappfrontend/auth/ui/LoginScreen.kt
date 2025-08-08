@@ -50,7 +50,7 @@ fun LoginScreen(
         onNavigateToSignUp = onNavigateToSignUp
     )
 
-    viewModel.login()   // todo: remove after testi
+//    viewModel.login()   // todo: remove after testing
 }
 
 @Composable

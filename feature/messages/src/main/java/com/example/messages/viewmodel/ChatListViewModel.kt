@@ -1,8 +1,9 @@
 package com.example.messages.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.chatappfrontend.common.ResultWrapper
+import com.chatappfrontend.common.Resource
 import com.chatappfrontend.common.UiEvent
+import com.chatappfrontend.common.formatChatDate
 import com.chatappfrontend.common.navigation.Screen
 import com.chatappfrontend.domain.LogoutUseCase
 import com.chatappfrontend.domain.repository.MessageRepository
@@ -13,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,18 +51,43 @@ class ChatListViewModel @Inject constructor(
 
     fun getChats() {
         viewModelScope.launch {
-            when (val result = messageRepository.getChats()) {
-                is ResultWrapper.Success -> {
-                    _uiState.value = _uiState.value.copy(
-                        chatInfos = result.data,
-                    )
+            val userId = dataStoreManager.getUserId() ?: ""
+            val result = messageRepository.getChats(currentUserId = userId)
+            result.collect { resource ->
+                when (resource) {
+                    is Resource.Error<*> -> {}
+                    is Resource.Loading<*> -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                    }
+
+                    is Resource.Success<*> -> {
+                        _uiState.value = _uiState.value.copy(
+                            chats = resource.data?.map { chat ->
+                                chat.copy(
+                                    lastMessageTimeStamp = formatChatDate(chat.lastMessageTimeStamp)
+                                )
+                            } ?: listOf(),
+                            isLoading = false
+                        )
+                    }
                 }
-                is ResultWrapper.Error -> {
-                }
-                is ResultWrapper.Exception -> {
-                }
-                ResultWrapper.Ignored -> {}
             }
+//            when (val result = messageRepository.getChats()) {
+//                is ResultWrapper.Success -> {
+//                    _uiState.value = _uiState.value.copy(
+//                        chatInfos = result.data,
+//                    )
+//                }
+//                is ResultWrapper.Error -> {
+//                }
+//                is ResultWrapper.Exception -> {
+//                }
+//                ResultWrapper.Ignored -> {}
+//            }
         }
     }
 

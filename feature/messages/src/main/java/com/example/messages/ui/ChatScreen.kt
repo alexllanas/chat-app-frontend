@@ -3,7 +3,9 @@ package com.example.messages.ui
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -61,43 +62,31 @@ private const val MAX_TEXT_FIELD_LINES = 12
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
+    modifier: Modifier = Modifier,
     chatId: String?,
     userId: String?,
     username: String?,
     onBackPressed: () -> Unit,
-    viewModel: ChatViewModel = hiltViewModel(),
-    modifier: Modifier = Modifier
+    viewModel: ChatViewModel = hiltViewModel()
 ) {
-    Log.d("ChatScreen", "ChatScreen called with chatId: $chatId, userId: $userId")
     val uiState by viewModel.uiState.collectAsState()
 
-    val listState = rememberLazyListState()
-
     LaunchedEffect(Unit) {
-        viewModel.initializeData(chatId = chatId, userId = userId)
-    }
-    LaunchedEffect(uiState.messages.size) {
-//        if (uiState.messages.isNotEmpty()) {
-//            listState.scrollToItem(uiState.messages.lastIndex)
-//        }
+        viewModel.initializeData(chatId = chatId)
     }
     Content(
+        modifier = modifier,
         chatId = chatId,
         userId = userId,
         username = username,
         messages = uiState.messages,
-        listState = listState,
-        message = uiState.textFieldInput,
+        textInput = uiState.textFieldInput,
+        isLoading = uiState.isLoading,
         setMessage = viewModel::setMessage,
         sendMessage = { chatId, userId ->
-            Log.d(
-                "ChatScreen",
-                "Sending message: ${uiState.textFieldInput} to chatId: $chatId, userId: $userId"
-            )
             viewModel.sendMessage(chatId = chatId, recipientId = userId)
         },
-        onBackPressed = onBackPressed,
-        modifier = modifier
+        onBackPressed = onBackPressed
     )
 
 }
@@ -105,16 +94,16 @@ fun ChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun Content(
+    modifier: Modifier = Modifier,
     chatId: String?,
     userId: String?,
     username: String?,
     messages: List<Message>,
-    listState: LazyListState,
-    message: String,
+    textInput: String,
+    isLoading: Boolean,
     setMessage: (String) -> Unit,
     sendMessage: (String, String) -> Unit,
-    onBackPressed: () -> Unit,
-    modifier: Modifier = Modifier
+    onBackPressed: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -142,39 +131,15 @@ internal fun Content(
                 .fillMaxSize()
         ) {
             if (messages.isEmpty()) {
-                Text(
-                    text = "No messages yet",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .weight(1f),
-                    textAlign = TextAlign.Center
-                )
+                EmptyMessageListState(modifier = Modifier.weight(1f))
             } else {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentPadding = PaddingValues(
-                        start = 16.dp,
-                        end = 16.dp,
-                        top = 8.dp,
-                        bottom = 8.dp
-                    ),
-                    reverseLayout = true
-                ) {
-                    items(messages) { message ->
-                        Log.d("ChatScreen", "Displaying message: ${message.content}")
-                        Message(
-                            message = message,
-                            userId = userId
-                        )
-                    }
-                }
+                MessageList(
+                    messages = messages,
+                    userId = userId
+                )
             }
             MessageInput(
-                message = message,
+                textInput = textInput,
                 setMessage = setMessage,
                 sendMessage = {
                     sendMessage(chatId ?: "", userId ?: "")
@@ -190,10 +155,57 @@ internal fun Content(
 }
 
 @Composable
-private fun Message(
-    message: Message,
-    userId: String?,
+private fun EmptyMessageListState(
     modifier: Modifier = Modifier
+) {
+    Text(
+        text = "No messages yet",
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+private fun ColumnScope.MessageList(
+    modifier: Modifier = Modifier,
+    messages: List<Message>,
+    userId: String?
+) {
+    val listState = rememberLazyListState()
+
+    Box(
+        modifier.weight(1f)
+    ) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 8.dp,
+                bottom = 8.dp
+            ),
+            reverseLayout = true
+        ) {
+            items(messages) { message ->
+                Log.d("ChatScreen", "Displaying message: ${message.content}")
+                Message(
+                    message = message,
+                    userId = userId
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun Message(
+    modifier: Modifier = Modifier,
+    message: Message,
+    userId: String?
 ) {
     Row(
         modifier = modifier
@@ -264,10 +276,10 @@ private fun Message(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MessageInput(
-    message: String,
+    modifier: Modifier,
+    textInput: String,
     setMessage: (String) -> Unit,
-    sendMessage: () -> Unit,
-    modifier: Modifier
+    sendMessage: () -> Unit
 ) {
     Row(
         modifier = modifier
@@ -275,7 +287,7 @@ internal fun MessageInput(
         verticalAlignment = Alignment.CenterVertically
     ) {
         OutlinedTextField(
-            value = message,
+            value = textInput,
             onValueChange = setMessage,
             maxLines = MAX_TEXT_FIELD_LINES,
             modifier = Modifier
@@ -291,8 +303,8 @@ internal fun MessageInput(
 
 @Composable
 private fun SendButton(
-    sendMessage: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
+    sendMessage: () -> Unit
 ) {
     Button(
         onClick = sendMessage,
@@ -332,11 +344,11 @@ fun ChatScreenPreview() {
                 chatId = "TODO()",
             )
         ),
-        listState = rememberLazyListState(),
-        message = "",
+        textInput = "",
         setMessage = {},
         sendMessage = { _, _ -> },
         onBackPressed = {},
-        username = "alex"
+        username = "alex",
+        isLoading = false
     )
 }
