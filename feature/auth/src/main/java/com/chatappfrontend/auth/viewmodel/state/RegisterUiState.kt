@@ -7,5 +7,8 @@ data class RegisterUiState(
     val confirmPassword: String = "password",
     val isLoading: Boolean = false,
     val isRegistered: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val showDialog: Boolean = false,
+    val dialogTitle: String = "",
+    val dialogBody: String = ""
 )

@@ -20,4 +20,8 @@
     <string name="error_passwords_no_match">Passwords do not match</string>
     <string name="message_transmission_failure">Failed to send</string>
     <string name="message_sending">Sending</string>
+    <string name="dialog_title_login_failure">Unable to log in</string>
+    <string name="dialog_body_login_failure">An unexpected error occurred. Please try to log in again.</string>
+    <string name="dialog_title_sign_up_failure">Unable to sign up</string>
+    <string name="dialog_body_sign_up_failure">An unexpected error occurred. Please try to sign up again.</string>
 </resources>

@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chatappfrontend.auth.viewmodel.LoginViewModel
 import com.chatappfrontend.auth.viewmodel.state.LoginUiState
 import com.chatappfrontend.common.UiEvent
+import com.chatappfrontend.ui.dialog.ErrorDialog
 import com.chatappfrontend.ui.ErrorText
 import com.example.common_android.R
 
@@ -27,19 +28,34 @@ fun LoginScreen(
     onLoginSuccess: (String) -> Unit,
     onNavigateToSignUp: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
+
+    // todo: remove after testing
+    LaunchedEffect(Unit) {
+//        viewModel.login()
+    }
+
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UiEvent.Navigate -> {
                     onLoginSuccess(event.route)
                 }
-
-                is UiEvent.ShowSnackbar -> {}
             }
         }
     }
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    if (dialogState.isVisible) {
+        ErrorDialog(
+            title = dialogState.title,
+            body = dialogState.body,
+            dismissDialog = {
+                viewModel.dismissDialog()
+            }
+        )
+    }
 
     LoginScreenContent(
         modifier = modifier,

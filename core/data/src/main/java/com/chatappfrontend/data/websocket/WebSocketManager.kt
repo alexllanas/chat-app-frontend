@@ -6,18 +6,12 @@ import com.chatappfrontend.data.BuildConfig
 import com.chatappfrontend.data.MessagePayloadDTO
 import com.chatappfrontend.data.mapper.toMessage
 import com.chatappfrontend.domain.model.Message
-import com.chatappfrontend.domain.repository.MessageRepository
-import com.example.network.model.MessageDTO
+import com.chatappfrontend.network.model.MessageDTO
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -94,7 +88,7 @@ class WebSocketManager @Inject constructor(
         val wasSent = webSocket.send(text = payload)
         if (wasSent) {
             Log.d("WebSocketManager", "Message sent successfully")
-            return ResultWrapper.Success(Message.Status.SENT)
+            return ResultWrapper.Success(Message.Status.FAILED)
         } else {
             Log.e("WebSocketManager", "Failed to send message")
             return ResultWrapper.Success(Message.Status.FAILED)

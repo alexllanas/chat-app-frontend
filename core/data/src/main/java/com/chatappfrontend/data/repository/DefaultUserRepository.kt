@@ -1,16 +1,10 @@
 package com.chatappfrontend.data.repository
 
-import com.chatappfrontend.common.Resource
-import com.chatappfrontend.common.ResultWrapper
-import com.chatappfrontend.domain.model.User
 import com.chatappfrontend.data.mapper.toUser
 import com.chatappfrontend.data.mapper.toUserEntity
 import com.chatappfrontend.domain.repository.UserRepository
-import com.example.database.LocalDataSource
-import com.example.network.RemoteDataSource
-import com.example.network.utils.safeApiCall
-import com.example.security.DataStoreManager
-import kotlinx.coroutines.flow.Flow
+import com.chatappfrontend.database.LocalDataSource
+import com.chatappfrontend.network.RemoteDataSource
 import kotlinx.coroutines.flow.map
 import networkBoundResource
 import javax.inject.Inject

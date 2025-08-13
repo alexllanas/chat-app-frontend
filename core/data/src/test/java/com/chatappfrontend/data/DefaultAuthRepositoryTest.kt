@@ -2,9 +2,9 @@ package com.chatappfrontend.data
 
 import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.data.repository.DefaultAuthRepository
-import com.example.network.RemoteDataSource
-import com.example.network.model.AuthenticationResponseDTO
-import com.example.security.DataStoreManager
+import com.chatappfrontend.network.RemoteDataSource
+import com.chatappfrontend.network.model.AuthenticationResponseDTO
+import com.chatappfrontend.security.DataStoreManager
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -85,7 +85,7 @@ class DefaultAuthRepositoryTest {
 
         val result = repository.registerUser("alex", "test@example.com", "password123")
 
-        assertEquals("Email exists", (result as ResultWrapper.Error).message)
+        assertEquals("Email exists", (result as ResultWrapper.Failure).message)
     }
 
     @Test
@@ -96,8 +96,8 @@ class DefaultAuthRepositoryTest {
 
         val result = repository.registerUser("testuser", "test@example.com", "password")
 
-        assertTrue(result is ResultWrapper.Exception)
-        assertEquals("Network failure", (result as ResultWrapper.Exception).exception.message)
+        assertTrue(result is ResultWrapper.Error)
+        assertEquals("Network failure", (result as ResultWrapper.Error).exception.message)
     }
 
     @Test

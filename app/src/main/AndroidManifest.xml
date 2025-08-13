@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name="com.chatappfrontend.CAFApplication"
+        android:name="com.chatappfrontend.app.CAFApplication"
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -15,9 +15,10 @@
         android:theme="@style/Theme.Chatappfrontend"
         tools:targetApi="31">
         <activity
-            android:name="com.chatappfrontend.MainActivity"
+            android:name="com.chatappfrontend.app.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Chatappfrontend">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -2,9 +2,9 @@ package com.chatappfrontend.data.mapper
 
 import com.chatappfrontend.domain.model.ChatInfo
 import com.chatappfrontend.domain.model.ChatSession
-import com.example.database.model.ChatInfoEntity
-import com.example.network.model.ChatInfoDTO
-import com.example.network.model.ChatSessionDTO
+import com.chatappfrontend.database.model.ChatInfoEntity
+import com.chatappfrontend.network.model.ChatInfoDTO
+import com.chatappfrontend.network.model.ChatSessionDTO
 
 fun ChatInfoDTO.toChatInfo() = ChatInfo(
     id = id,

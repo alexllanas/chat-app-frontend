@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-import com.chatappfrontend.common.Resource
+import com.chatappfrontend.common.DataResource
 import kotlinx.coroutines.flow.*
 
-/**
- * A generic class that can provide a resource backed by both the sqlite database and the network.
- *
- * Credit: <a href="https://stackoverflow.com/users/6401755/juan-cruz-soler">Juan Cruz Soler</a> and <a href="https://stackoverflow.com/users/2997980/n1hk">N1hk</a>
- * @see <a href="https://stackoverflow.com/questions/58486364/networkboundresource-with-kotlin-coroutines?rq=1">source</a>
- *
- * @param <ResultType>
- * @param <RequestType>
-</RequestType></ResultType>
- */
 inline fun <ResultType, RequestType> networkBoundResource(
     crossinline query: () -> Flow<ResultType>,
     crossinline fetch: suspend () -> RequestType,
@@ -36,16 +26,16 @@ inline fun <ResultType, RequestType> networkBoundResource(
     val data = query().first()
 
     val flow = if (shouldFetch(data)) {
-        emit(Resource.Loading(data))
+        emit(DataResource.Loading(data))
 
         try {
             saveFetchResult(fetch())
-            query().map { Resource.Success(it) }
+            query().map { DataResource.Success(it) }
         } catch (throwable: Throwable) {
-            query().map { Resource.Error(throwable, it) }
+            query().map { DataResource.Error(throwable, it) }
         }
     } else {
-        query().map { Resource.Success(it) }
+        query().map { DataResource.Success(it) }
     }
 
     emitAll(flow)

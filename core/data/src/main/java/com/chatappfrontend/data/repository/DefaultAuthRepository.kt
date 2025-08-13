@@ -1,12 +1,13 @@
 package com.chatappfrontend.data.repository
 
+import com.chatappfrontend.common.DataResource
 import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.domain.model.User
 import com.chatappfrontend.data.mapper.toUser
 import com.chatappfrontend.domain.repository.AuthRepository
-import com.example.network.RemoteDataSource
-import com.example.network.utils.safeApiCall
-import com.example.security.DataStoreManager
+import com.chatappfrontend.network.RemoteDataSource
+import com.chatappfrontend.network.utils.safeApiCall
+import com.chatappfrontend.security.DataStoreManager
 import javax.inject.Inject
 
 class DefaultAuthRepository @Inject constructor(

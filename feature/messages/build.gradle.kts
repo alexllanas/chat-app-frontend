@@ -36,46 +36,61 @@ android {
 }
 
 dependencies {
+
+    // AndroidX
     implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.okhttp)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Material
+    implementation(libs.material)
+
+    // Navigation
     implementation(libs.navigation)
     implementation(libs.navigationUi)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose) // Compose Navigation + Hilt
+
+    // Image Loading
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
+    // Networking
+    implementation(libs.okhttp)
 
-    // For dependency injection
+    // Hilt / Dagger
     implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
-    // For instrumentation tests
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.compiler)
-    // For local unit tests
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.compiler)
 
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+    testImplementation(libs.androidx.paging.common)
+
+    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Project modules
     implementation(project(":core:common"))
     implementation(project(":core:common-android"))
     implementation(project(":core:ui"))

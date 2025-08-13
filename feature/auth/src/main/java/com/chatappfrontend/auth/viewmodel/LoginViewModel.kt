@@ -4,9 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.chatappfrontend.auth.viewmodel.state.LoginUiState
 import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.common.UiEvent
-import com.chatappfrontend.domain.LoginUseCase
 import com.chatappfrontend.ui.BaseViewModel
 import com.chatappfrontend.common_android.StringProvider
+import com.chatappfrontend.domain.repository.AuthRepository
 import com.example.common_android.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,12 +18,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
-    private val stringProvider: StringProvider
+    private val stringProvider: StringProvider,
+    private val authRepository: AuthRepository
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(value = LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+
 
     fun login() {
         viewModelScope.launch {
@@ -37,7 +38,7 @@ class LoginViewModel @Inject constructor(
                 it.copy(isLoading = true, errorMessage = null)
             }
 
-            val result = loginUseCase.invoke(
+            val result = authRepository.login(
                 email = uiState.value.email,
                 password = uiState.value.password,
             )
@@ -46,18 +47,25 @@ class LoginViewModel @Inject constructor(
                 is ResultWrapper.Success -> {
                     emitUiEvent(event = UiEvent.Navigate("chat_list"))
                 }
-                is ResultWrapper.Error -> {
-                    _uiState.update {   // failed to login
-                        it.copy(isLoading = false, errorMessage = result.message)
-                    }
-                }
-                is ResultWrapper.Exception -> {
-                    _uiState.update {   // unexpected error
-                        it.copy(isLoading = false, errorMessage = result.exception.message)
+
+                is ResultWrapper.Failure -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message
+                        )
                     }
                 }
 
-                ResultWrapper.Ignored -> { }
+                is ResultWrapper.Error -> {
+                    _uiState.update {
+                        it.copy(isLoading = false)
+                    }
+                    showDialog(
+                        title = stringProvider.getString(R.string.dialog_title_login_failure),
+                        body = stringProvider.getString(R.string.dialog_body_login_failure),
+                    )
+                }
             }
         }
     }

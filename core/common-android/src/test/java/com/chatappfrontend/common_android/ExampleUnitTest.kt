@@ -1,4 +1,4 @@
-package com.example.common_android
+package com.chatappfrontend.common_android
 
 import org.junit.Test
 

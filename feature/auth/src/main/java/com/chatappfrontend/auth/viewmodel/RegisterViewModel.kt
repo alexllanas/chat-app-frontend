@@ -7,7 +7,7 @@ import com.chatappfrontend.common.ResultWrapper
 import com.chatappfrontend.common.UiEvent
 import com.chatappfrontend.common.navigation.Screen
 import com.chatappfrontend.common_android.StringProvider
-import com.chatappfrontend.domain.RegisterUserUseCase
+import com.chatappfrontend.domain.repository.AuthRepository
 import com.chatappfrontend.ui.BaseViewModel
 import com.example.common_android.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerUserUseCase: RegisterUserUseCase,
-    private val stringProvider: StringProvider
+    private val stringProvider: StringProvider,
+    private val authRepository: AuthRepository
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(value = RegisterUiState())
@@ -40,7 +40,7 @@ class RegisterViewModel @Inject constructor(
                 it.copy(isLoading = true, errorMessage = null)
             }
 
-            val result = registerUserUseCase.invoke(
+            val result = authRepository.registerUser(
                 username = uiState.value.username,
                 email = uiState.value.email,
                 password = uiState.value.password,
@@ -50,14 +50,26 @@ class RegisterViewModel @Inject constructor(
                 is ResultWrapper.Success -> {
                     emitUiEvent(event = UiEvent.Navigate(Screen.ChatList.route))
                 }
-                is ResultWrapper.Error -> {
+
+                is ResultWrapper.Failure -> {
                     if (result.code == 409)
-                    _uiState.update { it.copy(isLoading = false, errorMessage = result.message) }
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = result.message
+                            )
+                        }
                 }
-                is ResultWrapper.Exception -> {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = result.exception.message) }
+
+                is ResultWrapper.Error -> {
+                    _uiState.update {
+                        it.copy(isLoading = false)
+                    }
+                    showDialog(
+                        title = stringProvider.getString(R.string.dialog_title_sign_up_failure),
+                        body = stringProvider.getString(R.string.dialog_body_sign_up_failure),
+                    )
                 }
-                ResultWrapper.Ignored -> {}
             }
         }
     }
@@ -67,7 +79,9 @@ class RegisterViewModel @Inject constructor(
             username.isBlank() -> stringProvider.getString(R.string.error_username_empty)
             email.isBlank() && password.isBlank() -> stringProvider.getString(R.string.error_email_password_empty)
             email.isBlank() -> stringProvider.getString(R.string.error_email_empty)
-            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> stringProvider.getString(R.string.error_invalid_email)
+            !Patterns.EMAIL_ADDRESS.matcher(email)
+                .matches() -> stringProvider.getString(R.string.error_invalid_email)
+
             password.isBlank() -> stringProvider.getString(R.string.error_password_empty)
             password.length < 6 -> stringProvider.getString(R.string.error_password_short)
             confirmPassword.isBlank() -> stringProvider.getString(R.string.error_confirm_password_empty)

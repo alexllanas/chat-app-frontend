@@ -1,7 +1,7 @@
-package com.example.common_android.di
+package com.chatappfrontend.common_android.di
 
 import android.content.Context
-import com.example.common_android.DefaultStringProvider
+import com.chatappfrontend.common_android.DefaultStringProvider
 import com.chatappfrontend.common_android.StringProvider
 import dagger.Module
 import dagger.Provides

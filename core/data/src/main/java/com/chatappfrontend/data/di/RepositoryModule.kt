@@ -4,9 +4,9 @@ import com.chatappfrontend.data.repository.DefaultAuthRepository
 import com.chatappfrontend.data.repository.DefaultMessageRepository
 import com.chatappfrontend.data.repository.DefaultUserRepository
 import com.chatappfrontend.data.websocket.WebSocketManager
-import com.example.database.LocalDataSource
-import com.example.network.RemoteDataSource
-import com.example.security.DataStoreManager
+import com.chatappfrontend.database.LocalDataSource
+import com.chatappfrontend.network.RemoteDataSource
+import com.chatappfrontend.security.DataStoreManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

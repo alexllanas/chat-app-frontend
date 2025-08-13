@@ -1,9 +1,9 @@
 package com.chatappfrontend.data.mapper
 
-import com.chatappfrontend.common.formatMessageTime
+import com.chatappfrontend.common.util.formatMessageTime
 import com.chatappfrontend.domain.model.Message
-import com.example.database.model.MessageEntity
-import com.example.network.model.MessageDTO
+import com.chatappfrontend.database.model.MessageEntity
+import com.chatappfrontend.network.model.MessageDTO
 
 fun MessageDTO.toMessage() = Message(
     id = id,

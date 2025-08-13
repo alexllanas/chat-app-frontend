@@ -47,7 +47,7 @@ dependencies {
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx) // Kotlin Coroutines support
 
-    // Hilt / Dagger
+    // Dagger/Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
@@ -55,6 +55,11 @@ dependencies {
     kaptAndroidTest(libs.hilt.compiler)
     testImplementation(libs.hilt.android.testing) // For local unit tests
     kaptTest(libs.hilt.compiler)
+
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+    testImplementation(libs.androidx.paging.common)
+    implementation(libs.androidx.paging.compose)
 
     // Project
     implementation(project(":core:common"))

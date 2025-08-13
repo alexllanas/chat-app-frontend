@@ -15,6 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chatappfrontend.auth.viewmodel.RegisterViewModel
 import com.chatappfrontend.common.UiEvent
+import com.chatappfrontend.ui.dialog.ErrorDialog
 import com.chatappfrontend.ui.ErrorText
 import com.example.common_android.R
 
@@ -26,14 +27,26 @@ fun RegisterScreen(
     onRegisterSuccess: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UiEvent.Navigate -> onRegisterSuccess(event.route)
-                is UiEvent.ShowSnackbar -> {} // handle as needed
             }
         }
+    }
+
+
+
+    if (dialogState.isVisible) {
+        ErrorDialog(
+            title = dialogState.title,
+            body = dialogState.body,
+            dismissDialog = {
+                viewModel.dismissDialog()
+            }
+        )
     }
 
     Column(
@@ -136,3 +149,4 @@ fun RegisterScreen(
         }
     }
 }
+

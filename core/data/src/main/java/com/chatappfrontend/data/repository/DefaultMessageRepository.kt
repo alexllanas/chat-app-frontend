@@ -10,9 +10,9 @@ import com.chatappfrontend.data.mapper.toMessageEntity
 import com.chatappfrontend.data.websocket.WebSocketManager
 import com.chatappfrontend.domain.model.Message
 import com.chatappfrontend.domain.repository.MessageRepository
-import com.example.database.LocalDataSource
-import com.example.network.RemoteDataSource
-import com.example.security.DataStoreManager
+import com.chatappfrontend.database.LocalDataSource
+import com.chatappfrontend.network.RemoteDataSource
+import com.chatappfrontend.security.DataStoreManager
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.map
 import networkBoundResource
@@ -46,12 +46,11 @@ class DefaultMessageRepository @Inject constructor(
 
     override suspend fun getChats(currentUserId: String) = networkBoundResource(
         query = {
-            val x = db.getChats().map { list ->
+            db.getChats().map { list ->
                 list.map { chatInfo ->
                     chatInfo.toChatInfo()
                 }
             }
-            x
         },
         fetch = {
             api.getChats(currentUserId = currentUserId).body()
@@ -93,7 +92,8 @@ class DefaultMessageRepository @Inject constructor(
         },
         shouldFetch = {
             // if last sync was > X mins/hours/days or is empty
-            it.isEmpty()
+//            it.isEmpty()
+            true
         }
     )
 }
